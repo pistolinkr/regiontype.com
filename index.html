@@ -47,7 +47,7 @@
 <link rel="icon" type="image/png" sizes="any" media="(prefers-color-scheme: light)" href="favicon/dark.png?v=0.95">
 <link rel="icon" type="image/png" sizes="any" href="favicon/dark.png?v=0.95">
 <!-- 아이콘은 assets/*.svg 마스크로 그린다 (style.css 의 .i-*) -->
-<link rel="stylesheet" href="style.css?v=0.95">
+<link rel="stylesheet" href="style.css?v=0.97">
 </head>
 <body>
 
@@ -75,12 +75,13 @@
   </nav>
 </section>
 
-<!-- 지역 목록 -->
+<!-- 코스 목록 — 지도 보물찾기보다 칠 이름·개수가 먼저다 -->
 <section id="regions" class="screen">
   <div class="screen-head">
     <button class="back" data-go="title" data-i18n-aria="back" aria-label="뒤로"><i class="i i-arrow-left" aria-hidden="true"></i></button>
-    <h2 class="head" data-i18n="regions">지역</h2>
+    <h2 class="head" data-i18n="pickCourse">코스 고르기</h2>
   </div>
+  <p class="course-lead" id="courseLead"></p>
   <div class="course-stage">
     <ul class="course-list" id="regionList"></ul>
   </div>
@@ -297,6 +298,6 @@
   </form>
 </dialog>
 
-<script src="app.js?v=0.95"></script>
+<script src="app.js?v=0.97"></script>
 </body>
 </html>

@@ -121,20 +121,53 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 }
 .back .i{font-size:34px}
 
-/* ── 코스 목록 — 레퍼런스: 색 블록 상단 + 크림 본문, 아래 중앙에 공용 Play ── */
+/* ── 코스 목록 — 칠 이름·개수·상태가 한 줄. 지도 카드는 쓰지 않는다 ── */
+.course-lead{
+  color:var(--ink-soft);font-size:16px;font-weight:600;line-height:1.55;
+  margin:-12px 0 8px;max-width:42em;word-break:keep-all;
+}
 .course-stage{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:40px;
+  flex:1;display:flex;flex-direction:column;align-items:stretch;
+  justify-content:flex-start;gap:10px;min-height:0;overflow:auto;
+  width:min(720px,100%);
 }
-/* 목록은 무대 폭을 다 쓴다. 내용에 맞춰 줄어들게 두면 그 폭이 닫힌 카드(230px)로
-   굳어서, 뒤집힌 카드가 고르는 판 크기로 자라지 못하고 도로 눌린다. */
 .course-list{
-  list-style:none;display:flex;align-items:center;justify-content:center;
-  width:100%;gap:26px;padding:0;perspective:1400px;
+  list-style:none;display:flex;flex-direction:column;align-items:stretch;
+  width:100%;gap:6px;padding:0 0 24px;
 }
-.course-list li{flex:0 0 auto}
-.course-list li{display:flex;position:relative}
+.course-list li{display:block;position:relative}
 .course-list li[hidden]{display:none}
+.course-group{
+  font-size:13px;font-weight:800;color:var(--ink-soft);
+  padding:14px 4px 4px;letter-spacing:-.01em;
+}
+.course-list .course-group:first-child{padding-top:0}
+.course-row{
+  width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto auto;
+  gap:12px 18px;align-items:baseline;text-align:left;
+  font:inherit;color:inherit;cursor:pointer;
+  background:var(--card);border:2px solid var(--grid);border-radius:6px;
+  padding:14px 18px;box-shadow:var(--shadow);
+  transition:border-color var(--fast) var(--ease-out),
+             background var(--fast) var(--ease-out),
+             translate var(--fast) var(--ease-out);
+}
+.course-row b{
+  font-size:20px;font-weight:800;letter-spacing:-.02em;word-break:keep-all;
+}
+.course-row-meta,.course-row-status{
+  font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.course-row-meta{color:var(--ink-soft)}
+.course-row-status{font-style:normal;font-weight:800;color:var(--ink-soft)}
+/* 상태는 글자가 먼저다. 테두리는 보조 — 색만으로 가르지 않는다 */
+.course-row[data-status="played"]{border-color:var(--block)}
+.course-row[data-status="played"] .course-row-status{color:var(--accent-text)}
+.course-row:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){
+  .course-row:hover{translate:0 -2px;border-color:var(--block-hi)}
+}
 
 /* 고르는 판 — 카드 뒷면. 지도가 남는 높이를 다 갖는다 */
 .pickmap{flex:1;min-height:0;display:grid;place-items:center;margin:8px 0 2px}

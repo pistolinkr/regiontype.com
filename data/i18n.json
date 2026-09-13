@@ -98,13 +98,19 @@
     "uploading": "올리는 중…",
     "notOnBoard": "이번 판 {n}점은 아직 순위표에 없습니다",
     "nth": "{n}위",
-    "cardLine": "{title} · {zoom}배율 · {score}점"
+    "cardLine": "{title} · {zoom}배율 · {score}점",
+    "statusIdle": "안 함",
+    "statusBest": "최고 {n}점",
+    "pickerLeadNested": "자치구 {places}곳을 치는 코스 하나, 구별 행정동 코스 {n}개.",
+    "pickerLeadSingle": "이 코스에서 {n}곳을 칩니다.",
+    "courseGroupGu": "자치구",
+    "courseGroupDong": "행정동"
   },
   "en": {
     "start": "Play",
     "options": "Settings",
     "about": "About",
-    "regions": "Places",
+    "regions": "Courses",
     "back": "Back",
     "quit": "Quit",
     "night": "Night mode",
@@ -199,7 +205,13 @@
     "uploading": "Posting…",
     "notOnBoard": "This {n}-pt run is not on the board yet",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} pts"
+    "cardLine": "{title} · {zoom}× · {score} pts",
+    "statusIdle": "Not started",
+    "statusBest": "Best {n}",
+    "pickerLeadNested": "One course of {places} districts, plus {n} per-district dong courses.",
+    "pickerLeadSingle": "This course has {n} places.",
+    "courseGroupGu": "Districts",
+    "courseGroupDong": "Dong courses"
   },
   "ja": {
     "start": "はじめる",
@@ -300,7 +312,13 @@
     "uploading": "送信中…",
     "notOnBoard": "今回の {n}点はまだランキングにありません",
     "nth": "{n}位",
-    "cardLine": "{title} · {zoom}倍 · {score}点"
+    "cardLine": "{title} · {zoom}倍 · {score}点",
+    "statusIdle": "未プレイ",
+    "statusBest": "ベスト {n}点",
+    "pickerLeadNested": "自治区{places}か所のコース1つと、区ごとの行政洞コース{n}。",
+    "pickerLeadSingle": "このコースは{n}か所です。",
+    "courseGroupGu": "自治区",
+    "courseGroupDong": "行政洞"
   },
   "de": {
     "start": "Spielen",
@@ -401,7 +419,13 @@
     "uploading": "Wird hochgeladen…",
     "notOnBoard": "Dieser {n}-Pkt-Lauf ist noch nicht in der Bestenliste",
     "nth": "Platz {n}",
-    "cardLine": "{title} · {zoom}× · {score} Pkt"
+    "cardLine": "{title} · {zoom}× · {score} Pkt",
+    "statusIdle": "Noch nicht",
+    "statusBest": "Rekord {n}",
+    "pickerLeadNested": "Ein Kurs mit {places} Bezirken und {n} Dong-Kurse pro Bezirk.",
+    "pickerLeadSingle": "In diesem Kurs {n} Orte.",
+    "courseGroupGu": "Bezirke",
+    "courseGroupDong": "Dong-Kurse"
   },
   "fr": {
     "start": "Jouer",
@@ -502,7 +526,13 @@
     "uploading": "Publication…",
     "notOnBoard": "Cette partie à {n} pts n’est pas encore au classement",
     "nth": "{n}e",
-    "cardLine": "{title} · {zoom}× · {score} pts"
+    "cardLine": "{title} · {zoom}× · {score} pts",
+    "statusIdle": "Pas commencé",
+    "statusBest": "Record {n}",
+    "pickerLeadNested": "Un parcours de {places} arrondissements, plus {n} parcours dong.",
+    "pickerLeadSingle": "Ce parcours compte {n} lieux.",
+    "courseGroupGu": "Arrondissements",
+    "courseGroupDong": "Parcours dong"
   },
   "es": {
     "start": "Jugar",
@@ -603,7 +633,13 @@
     "uploading": "Publicando…",
     "notOnBoard": "Esta partida de {n} pts aún no está en el ranking",
     "nth": "puesto {n}",
-    "cardLine": "{title} · {zoom}× · {score} pts"
+    "cardLine": "{title} · {zoom}× · {score} pts",
+    "statusIdle": "Sin empezar",
+    "statusBest": "Récord {n}",
+    "pickerLeadNested": "Un curso de {places} distritos, más {n} cursos dong.",
+    "pickerLeadSingle": "Este curso tiene {n} lugares.",
+    "courseGroupGu": "Distritos",
+    "courseGroupDong": "Cursos dong"
   },
   "pt": {
     "start": "Jogar",
@@ -704,7 +740,13 @@
     "uploading": "Publicando…",
     "notOnBoard": "Esta partida de {n} pts ainda não está no ranking",
     "nth": "{n}º",
-    "cardLine": "{title} · {zoom}× · {score} pts"
+    "cardLine": "{title} · {zoom}× · {score} pts",
+    "statusIdle": "Não iniciado",
+    "statusBest": "Recorde {n}",
+    "pickerLeadNested": "Um curso de {places} distritos, mais {n} cursos dong.",
+    "pickerLeadSingle": "Este curso tem {n} lugares.",
+    "courseGroupGu": "Distritos",
+    "courseGroupDong": "Cursos dong"
   },
   "zh": {
     "start": "开始",
@@ -805,13 +847,19 @@
     "uploading": "上传中…",
     "notOnBoard": "本次 {n} 分尚未上榜",
     "nth": "第 {n} 名",
-    "cardLine": "{title} · {zoom}× · {score} 分"
+    "cardLine": "{title} · {zoom}× · {score} 分",
+    "statusIdle": "未开始",
+    "statusBest": "最佳 {n}",
+    "pickerLeadNested": "一个 {places} 个自治区课程，外加 {n} 个行政洞课程。",
+    "pickerLeadSingle": "本课程有 {n} 个地点。",
+    "courseGroupGu": "自治区",
+    "courseGroupDong": "行政洞"
   },
   "it": {
     "start": "Gioca",
     "options": "Impostazioni",
     "about": "Info",
-    "regions": "Luoghi",
+    "regions": "Corsi",
     "back": "Indietro",
     "quit": "Esci",
     "night": "Modalità notturna",
@@ -906,13 +954,19 @@
     "uploading": "Pubblicazione…",
     "notOnBoard": "Questa partita da {n} pt non è ancora in classifica",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} pt"
+    "cardLine": "{title} · {zoom}× · {score} pt",
+    "statusIdle": "Non iniziato",
+    "statusBest": "Record {n}",
+    "pickerLeadNested": "Un percorso di {places} distretti, più {n} percorsi dong.",
+    "pickerLeadSingle": "Questo percorso ha {n} luoghi.",
+    "courseGroupGu": "Distretti",
+    "courseGroupDong": "Percorsi dong"
   },
   "nl": {
     "start": "Spelen",
     "options": "Instellingen",
     "about": "Over",
-    "regions": "Plaatsen",
+    "regions": "Cursussen",
     "back": "Terug",
     "quit": "Stoppen",
     "night": "Nachtmodus",
@@ -1007,13 +1061,19 @@
     "uploading": "Plaatsen…",
     "notOnBoard": "Deze run van {n} pt staat nog niet op de ranglijst",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} pt"
+    "cardLine": "{title} · {zoom}× · {score} pt",
+    "statusIdle": "Niet gestart",
+    "statusBest": "Record {n}",
+    "pickerLeadNested": "Eén parcours van {places} districten, plus {n} dong-parcours.",
+    "pickerLeadSingle": "Dit parcours heeft {n} plaatsen.",
+    "courseGroupGu": "Districten",
+    "courseGroupDong": "Dong-parcours"
   },
   "pl": {
     "start": "Graj",
     "options": "Ustawienia",
     "about": "O aplikacji",
-    "regions": "Miejsca",
+    "regions": "Kursy",
     "back": "Wstecz",
     "quit": "Zakończ",
     "night": "Tryb nocny",
@@ -1108,13 +1168,19 @@
     "uploading": "Publikowanie…",
     "notOnBoard": "Ten wynik {n} pkt nie jest jeszcze w rankingu",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} pkt"
+    "cardLine": "{title} · {zoom}× · {score} pkt",
+    "statusIdle": "Nie zaczęto",
+    "statusBest": "Rekord {n}",
+    "pickerLeadNested": "Jeden kurs {places} dzielnic oraz {n} kursów dong.",
+    "pickerLeadSingle": "Ten kurs ma {n} miejsc.",
+    "courseGroupGu": "Dzielnice",
+    "courseGroupDong": "Kursy dong"
   },
   "cs": {
     "start": "Hrát",
     "options": "Nastavení",
     "about": "O hře",
-    "regions": "Místa",
+    "regions": "Kurzy",
     "back": "Zpět",
     "quit": "Konec",
     "night": "Noční režim",
@@ -1209,13 +1275,19 @@
     "uploading": "Zveřejňování…",
     "notOnBoard": "Tento výsledek {n} b. ještě není v žebříčku",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} b."
+    "cardLine": "{title} · {zoom}× · {score} b.",
+    "statusIdle": "Nezačato",
+    "statusBest": "Rekord {n}",
+    "pickerLeadNested": "Jeden kurz {places} obvodů a {n} kurzů dong.",
+    "pickerLeadSingle": "Tento kurz má {n} míst.",
+    "courseGroupGu": "Obvody",
+    "courseGroupDong": "Kurzy dong"
   },
   "sv": {
     "start": "Spela",
     "options": "Inställningar",
     "about": "Om",
-    "regions": "Platser",
+    "regions": "Banor",
     "back": "Tillbaka",
     "quit": "Avsluta",
     "night": "Nattläge",
@@ -1310,13 +1382,19 @@
     "uploading": "Publicerar…",
     "notOnBoard": "Den här omgången på {n} p finns inte på listan än",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} p"
+    "cardLine": "{title} · {zoom}× · {score} p",
+    "statusIdle": "Inte börjad",
+    "statusBest": "Rekord {n}",
+    "pickerLeadNested": "En bana med {places} distrikt plus {n} dong-banor.",
+    "pickerLeadSingle": "Den här banan har {n} platser.",
+    "courseGroupGu": "Distrikt",
+    "courseGroupDong": "Dong-banor"
   },
   "nb": {
     "start": "Spill",
     "options": "Innstillinger",
     "about": "Om",
-    "regions": "Steder",
+    "regions": "Baner",
     "back": "Tilbake",
     "quit": "Avslutt",
     "night": "Nattmodus",
@@ -1411,13 +1489,19 @@
     "uploading": "Legger ut…",
     "notOnBoard": "Denne runden på {n} p er ikke på listen ennå",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} p"
+    "cardLine": "{title} · {zoom}× · {score} p",
+    "statusIdle": "Ikke startet",
+    "statusBest": "Rekord {n}",
+    "pickerLeadNested": "Én bane med {places} distrikter pluss {n} dong-baner.",
+    "pickerLeadSingle": "Denne banen har {n} steder.",
+    "courseGroupGu": "Distrikter",
+    "courseGroupDong": "Dong-baner"
   },
   "fi": {
     "start": "Pelaa",
     "options": "Asetukset",
     "about": "Tietoja",
-    "regions": "Paikat",
+    "regions": "Radat",
     "back": "Takaisin",
     "quit": "Lopeta",
     "night": "Yötila",
@@ -1512,13 +1596,19 @@
     "uploading": "Julkaistaan…",
     "notOnBoard": "Tämä {n} p:n suoritus ei ole vielä tulostaulussa",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} p"
+    "cardLine": "{title} · {zoom}× · {score} p",
+    "statusIdle": "Aloittamatta",
+    "statusBest": "Ennätys {n}",
+    "pickerLeadNested": "Yksi {places} alueen rata ja {n} dong-rataa.",
+    "pickerLeadSingle": "Tällä radalla on {n} paikkaa.",
+    "courseGroupGu": "Alueet",
+    "courseGroupDong": "Dong-radat"
   },
   "uk": {
     "start": "Грати",
     "options": "Налаштування",
     "about": "Про гру",
-    "regions": "Місця",
+    "regions": "Курси",
     "back": "Назад",
     "quit": "Вийти",
     "night": "Нічний режим",
@@ -1613,13 +1703,19 @@
     "uploading": "Публікація…",
     "notOnBoard": "Цей забіг на {n} очок ще немає в таблиці лідерів",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} очок"
+    "cardLine": "{title} · {zoom}× · {score} очок",
+    "statusIdle": "Не почато",
+    "statusBest": "Рекорд {n}",
+    "pickerLeadNested": "Один курс з {places} районів плюс {n} курсів дон.",
+    "pickerLeadSingle": "У цьому курсі {n} місць.",
+    "courseGroupGu": "Райони",
+    "courseGroupDong": "Курси дон"
   },
   "ro": {
     "start": "Joacă",
     "options": "Setări",
     "about": "Despre",
-    "regions": "Locuri",
+    "regions": "Trasee",
     "back": "Înapoi",
     "quit": "Ieșire",
     "night": "Mod nocturn",
@@ -1714,13 +1810,19 @@
     "uploading": "Se publică…",
     "notOnBoard": "Această rundă de {n} pct nu este încă în clasament",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} pct"
+    "cardLine": "{title} · {zoom}× · {score} pct",
+    "statusIdle": "Neînceput",
+    "statusBest": "Record {n}",
+    "pickerLeadNested": "Un traseu de {places} districte plus {n} trasee dong.",
+    "pickerLeadSingle": "Acest traseu are {n} locuri.",
+    "courseGroupGu": "Districte",
+    "courseGroupDong": "Trasee dong"
   },
   "hu": {
     "start": "Játék",
     "options": "Beállítások",
     "about": "Névjegy",
-    "regions": "Helyek",
+    "regions": "Körök",
     "back": "Vissza",
     "quit": "Kilépés",
     "night": "Éjszakai mód",
@@ -1815,13 +1917,19 @@
     "uploading": "Közzététel…",
     "notOnBoard": "Ez a {n} pontos játék még nincs fent a ranglistán",
     "nth": "#{n}.",
-    "cardLine": "{title} · {zoom}× · {score} pont"
+    "cardLine": "{title} · {zoom}× · {score} pont",
+    "statusIdle": "Még nem",
+    "statusBest": "Csúcs {n}",
+    "pickerLeadNested": "Egy {places} kerületes kör, plusz {n} dong kör.",
+    "pickerLeadSingle": "Ebben a körben {n} hely van.",
+    "courseGroupGu": "Kerületek",
+    "courseGroupDong": "Dong körök"
   },
   "bg": {
     "start": "Играй",
     "options": "Настройки",
     "about": "За играта",
-    "regions": "Места",
+    "regions": "Курсове",
     "back": "Назад",
     "quit": "Изход",
     "night": "Нощен режим",
@@ -1916,13 +2024,19 @@
     "uploading": "Публикуване…",
     "notOnBoard": "Този резултат от {n} т. все още не е в класацията",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} т."
+    "cardLine": "{title} · {zoom}× · {score} т.",
+    "statusIdle": "Незапочнато",
+    "statusBest": "Рекорд {n}",
+    "pickerLeadNested": "Един курс с {places} района плюс {n} курса dong.",
+    "pickerLeadSingle": "Този курс има {n} места.",
+    "courseGroupGu": "Райони",
+    "courseGroupDong": "Курсове dong"
   },
   "el": {
     "start": "Παίξε",
     "options": "Ρυθμίσεις",
     "about": "Σχετικά",
-    "regions": "Τοποθεσίες",
+    "regions": "Διαδρομές",
     "back": "Πίσω",
     "quit": "Έξοδος",
     "night": "Νυχτερινή λειτουργία",
@@ -2017,13 +2131,19 @@
     "uploading": "Δημοσίευση…",
     "notOnBoard": "Αυτή η βαθμολογία {n} β. δεν είναι ακόμα στην κατάταξη",
     "nth": "#{n}",
-    "cardLine": "{title} · {zoom}× · {score} β."
+    "cardLine": "{title} · {zoom}× · {score} β.",
+    "statusIdle": "Δεν ξεκίνησε",
+    "statusBest": "Ρεκόρ {n}",
+    "pickerLeadNested": "Μία διαδρομή {places} περιοχών και {n} διαδρομές dong.",
+    "pickerLeadSingle": "Αυτή η διαδρομή έχει {n} τοποθεσίες.",
+    "courseGroupGu": "Περιοχές",
+    "courseGroupDong": "Διαδρομές dong"
   },
   "tr": {
     "start": "Oyna",
     "options": "Ayarlar",
     "about": "Hakkında",
-    "regions": "Yerler",
+    "regions": "Parkurlar",
     "back": "Geri",
     "quit": "Çıkış",
     "night": "Gece modu",
@@ -2118,7 +2238,13 @@
     "uploading": "Yayınlanıyor…",
     "notOnBoard": "Bu {n} puanlık oyun henüz sıralamada değil",
     "nth": "{n}.",
-    "cardLine": "{title} · {zoom}× · {score} puan"
+    "cardLine": "{title} · {zoom}× · {score} puan",
+    "statusIdle": "Başlanmadı",
+    "statusBest": "Rekor {n}",
+    "pickerLeadNested": "{places} ilçelik bir parkur ve {n} dong parkuru.",
+    "pickerLeadSingle": "Bu parkurda {n} yer var.",
+    "courseGroupGu": "İlçeler",
+    "courseGroupDong": "Dong parkurları"
   },
   "vi": {
     "start": "Chơi",
@@ -2219,7 +2345,13 @@
     "continentNorthAmerica": "Bắc Mỹ",
     "continentSouthAmerica": "Nam Mỹ",
     "continentOceania": "Châu Đại Dương",
-    "continentAfricaMena": "Châu Phi & Trung Đông"
+    "continentAfricaMena": "Châu Phi & Trung Đông",
+    "statusIdle": "Chưa chơi",
+    "statusBest": "Kỷ lục {n}",
+    "pickerLeadNested": "Một lộ trình {places} quận, cộng {n} lộ trình phường/xã.",
+    "pickerLeadSingle": "Lộ trình này có {n} nơi.",
+    "courseGroupGu": "Quận",
+    "courseGroupDong": "Lộ trình phường"
   },
   "th": {
     "start": "เล่น",
@@ -2320,7 +2452,13 @@
     "continentNorthAmerica": "อเมริกาเหนือ",
     "continentSouthAmerica": "อเมริกาใต้",
     "continentOceania": "โอเชียเนีย",
-    "continentAfricaMena": "แอฟริกา·ตะวันออกกลาง"
+    "continentAfricaMena": "แอฟริกา·ตะวันออกกลาง",
+    "statusIdle": "ยังไม่เล่น",
+    "statusBest": "สถิติ {n}",
+    "pickerLeadNested": "คอร์สเขต {places} ที่ และคอร์สระดับตำบล {n} คอร์ส",
+    "pickerLeadSingle": "คอร์สนี้มี {n} ที่",
+    "courseGroupGu": "เขต",
+    "courseGroupDong": "คอร์สตำบล"
   },
   "id": {
     "start": "Main",
@@ -2421,7 +2559,13 @@
     "continentNorthAmerica": "Amerika Utara",
     "continentSouthAmerica": "Amerika Selatan",
     "continentOceania": "Oseania",
-    "continentAfricaMena": "Afrika & Timur Tengah"
+    "continentAfricaMena": "Afrika & Timur Tengah",
+    "statusIdle": "Belum mulai",
+    "statusBest": "Rekor {n}",
+    "pickerLeadNested": "Satu kursus {places} distrik, plus {n} kursus kecamatan.",
+    "pickerLeadSingle": "Kursus ini punya {n} tempat.",
+    "courseGroupGu": "Distrik",
+    "courseGroupDong": "Kursus kecamatan"
   },
   "ms": {
     "start": "Main",
@@ -2522,7 +2666,13 @@
     "continentNorthAmerica": "Amerika Utara",
     "continentSouthAmerica": "Amerika Selatan",
     "continentOceania": "Oceania",
-    "continentAfricaMena": "Afrika & Timur Tengah"
+    "continentAfricaMena": "Afrika & Timur Tengah",
+    "statusIdle": "Belum mula",
+    "statusBest": "Rekod {n}",
+    "pickerLeadNested": "Satu kursus {places} daerah, plus {n} kursus mukim.",
+    "pickerLeadSingle": "Kursus ini ada {n} tempat.",
+    "courseGroupGu": "Daerah",
+    "courseGroupDong": "Kursus mukim"
   },
   "ar": {
     "start": "ابدأ",
@@ -2623,6 +2773,12 @@
     "uploading": "جارٍ النشر…",
     "notOnBoard": "نتيجة {n} نقطة هذه غير موجودة في اللوحة بعد",
     "nth": "المركز {n}",
-    "cardLine": "{title} · {zoom}× · {score} نقطة"
+    "cardLine": "{title} · {zoom}× · {score} نقطة",
+    "statusIdle": "لم يبدأ",
+    "statusBest": "الأفضل {n}",
+    "pickerLeadNested": "مسار واحد من {places} منطقة، بالإضافة إلى {n} مسار dong.",
+    "pickerLeadSingle": "هذا المسار فيه {n} مكان.",
+    "courseGroupGu": "المناطق",
+    "courseGroupDong": "مسارات dong"
   }
 }

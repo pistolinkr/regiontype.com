@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = s => document.querySelector(s);
-const VER = '0.96';
+const VER = '0.97';
 const asset = p => p + (p.includes('?') ? '&' : '?') + 'v=' + VER;
 /* 설정 화면의 빌드 번호는 VER 에서 직접 읽는다. 손으로 적어두면 올릴 때마다
    맞춰야 할 자리가 하나 더 늘고, 언젠가 실제 빌드와 어긋난다. */
@@ -168,6 +168,7 @@ function go(id) {
   requestAnimationFrame(() => requestAnimationFrame(syncGrid));
   // 숨은 화면에서는 높이가 0으로 읽힌다. 보이게 된 뒤에 재어 둔다
   requestAnimationFrame(() => document.querySelectorAll('.course-list .card').forEach(measureCard));
+  if (id === 'regions') renderRegions();
 }
 
 function applyGrid(ox, oy, n) {
@@ -771,6 +772,56 @@ const load = slug => Promise.all([loadCourse(slug), loadGeom(slug)]);
 
 let regionRedraw = [];
 
+/* 코스 최고점은 rt.best.{slug}.z{배율}. 배율은 지금 3뿐이라 접두만 훑는다. */
+function courseBest(slug) {
+  let best = 0;
+  try {
+    const prefix = `rt.best.${slug}.`;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !k.startsWith(prefix)) continue;
+      const n = Number(localStorage.getItem(k) || 0);
+      if (n > best) best = n;
+    }
+  } catch {}
+  return best;
+}
+function courseStatus(slug) {
+  const n = courseBest(slug);
+  if (n > 0) return { kind: 'played', label: t('statusBest', { n }) };
+  return { kind: 'idle', label: t('statusIdle') };
+}
+
+function appendCourseGroup(list, label) {
+  const li = document.createElement('li');
+  li.className = 'course-group';
+  li.setAttribute('role', 'presentation');
+  li.textContent = label;
+  list.append(li);
+}
+
+function appendCourseRow(list, course) {
+  const st = courseStatus(course.slug);
+  const li = document.createElement('li');
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'course-row';
+  btn.dataset.slug = course.slug;
+  btn.dataset.status = st.kind;
+  const name = document.createElement('b');
+  name.textContent = courseLabel(course);
+  const meta = document.createElement('span');
+  meta.className = 'course-row-meta';
+  meta.textContent = t('places', { n: (course.items || []).length });
+  const status = document.createElement('em');
+  status.className = 'course-row-status';
+  status.textContent = st.label;
+  btn.append(name, meta, status);
+  btn.addEventListener('click', () => start(course.slug));
+  li.append(btn);
+  list.append(li);
+}
+
 async function renderRegions() {
   regionRedraw.forEach(f => {
     const i = REDRAW.indexOf(f);
@@ -778,108 +829,33 @@ async function renderRegions() {
   });
   regionRedraw = [];
   const regions = $('#regionList');
+  const lead = $('#courseLead');
   regions.replaceChildren();
+  if (lead) lead.textContent = '';
   const pack = WORLD.countries.find(c => c.id === COUNTRY) || WORLD.countries[0];
   if (!pack) return;
+  const leads = [];
   for (const r of pack.regions) {
-    /* 코스를 줄줄이 기다리면 지역 화면이 그만큼 늦게 뜬다. 한꺼번에 받는다. */
-    const [geom, courses] = await Promise.all([
-      loadGeom(r.thumb),
-      Promise.all(r.courses.map(loadCourse))
-    ]);
-
-    const li = document.createElement('li');
-    /* 카드탭은 카드 *밖*이다. 안에 두면 카드가 제 안쪽을 잘라내(overflow:hidden)
-       밖으로 못 나가고, 카드 안에 넣으면 카드와 함께 돌아 좌우가 뒤집힌다.
-       카드 뒤에 적어 형제 선택자(.card ~ .rail)로 열린 상태를 읽는다. */
-    li.innerHTML = `<div class="card" data-flip="false">
-        <button type="button" class="card-face card-front" aria-expanded="false">
-          <span class="card-top"><span class="thumb"></span></span>
-          <span class="card-body"><b></b><em></em><span class="desc"></span></span>
-        </button>
-      </div>
-      <div class="rail" role="tablist" aria-label="${t('cardView')}">
-        <button type="button" class="rail-b" data-pane="pick" role="tab" aria-selected="true">
-          <i class="i i-pin" aria-hidden="true"></i><span class="sr">${t('pickCourse')}</span>
-        </button>
-        <button type="button" class="rail-b" data-pane="rank" role="tab" aria-selected="false">
-          <i class="i i-chart" aria-hidden="true"></i><span class="sr">${t('rankTab')}</span>
-        </button>
-      </div>`;
-    const thumb = li.querySelector('.thumb');
-    const drawThumb = () => thumb.innerHTML = thumbSvg(geom);
-    REDRAW.push(drawThumb); regionRedraw.push(drawThumb); drawThumb();
-    const title = loc(r.title) || countryName(pack.id);
-    li.querySelector('.card-body b').textContent = title;
-    li.querySelector('.card-body em').textContent = t('nCourses', { n: r.courses.length });
-    li.querySelector('.desc').textContent = loc(r.description) || t('places', { n: courses[0]?.items.length || 0 });
-
-    const card = li.querySelector('.card');
-    const back = $('#regionTpl').content.firstElementChild.cloneNode(true);
-    back.classList.add('card-face');
-    card.append(back);
-    back.inert = true;
-
-    /* 카드를 돌리면 뒷면이 서울 비트맵이다. 목록에서 구 이름을 찾는 것보다
-       지도에서 짚는 게 빠르고, 어디인지가 곧 무엇인지다. */
-    const bySlug = new Map(courses.map(c => [c.slug, c]));
-    const byGu = new Map();
-    courses.forEach(c => {
-      const m = /^(\S+구)\s/.exec(c.title);
-      if (m && c.slug.endsWith('-dong')) byGu.set(m[1], c.slug);
-    });
-
-    const pane = back.querySelector('.pickmap');
-    const drawPick = () => {
-      pane.innerHTML = pickMapSvg(geom);
-      pane.querySelectorAll('.gu').forEach(g => {
-        const slug = r.nested && byGu.get(g.dataset.gu);
-        if (slug) g.dataset.slug = slug;
-        else if (r.nested) {
-          g.classList.add('off'); g.removeAttribute('tabindex'); g.removeAttribute('role');
-        }
-      });
-    };
-    REDRAW.push(drawPick); regionRedraw.push(drawPick); drawPick();
-
-    /* 이름 25개를 지도에 다 얹으면 서로 밟는다. 짚는 곳만 아래 한 줄로 읽는다. */
-    const name = back.querySelector('.pickname');
-    const idle = r.nested ? t('idleNested') : t('idleAdmin');
-    name.dataset.idle = idle;
-    name.textContent = idle;
-    const tell = g => {
-      if (!g) { name.textContent = idle; return; }
-      const c = g.dataset.slug && bySlug.get(g.dataset.slug);
-      if (c) name.textContent = `${c.title} · ${t('places', { n: c.items.length })}`;
-      else if (g.dataset.gu) name.textContent = g.dataset.gu;
-      else name.textContent = idle;
-    };
-    pane.addEventListener('pointerover', e => tell(e.target.closest('.gu')));
-    pane.addEventListener('pointerout', () => tell(null));
-    /* SVG 묶음은 초점을 받아도 focus 이벤트를 아예 안 쏜다(활성 요소만 바뀐다).
-       Tab 은 키를 뗄 때 새 초점 위에서 keyup 이 나므로 그걸로 읽는다. */
-    pane.addEventListener('keyup', e => {
-      const g = e.target.closest && e.target.closest('.gu');
-      if (g) tell(g);
-    });
-    /* SVG 묶음은 버튼이 아니라 Enter·Space 가 저절로 눌리지 않는다 */
-    pane.addEventListener('keydown', e => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      const g = e.target.closest('.gu[data-slug]');
-      if (!g) return;
-      e.preventDefault();
-      g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    const main = bySlug.get(r.main) || courses[0];
-    back.querySelector('.course.wide').dataset.slug = main.slug;
-    back.querySelector('.course.wide').textContent = courseLabel(main);
-
-    card.dataset.main = main.slug;
-    wireRegionBack(card, back, courses, li.querySelector('.rail'));
-    li.querySelector('.card-front').onclick = () => flip(card, true);
-    regions.append(li);
+    /* 고르는 판은 코스 이름·개수만 쓴다. 지도 도형은 받지 않는다. */
+    const courses = await Promise.all(r.courses.map(loadCourse));
+    const main = courses.find(c => c.slug === r.main) || courses[0];
+    const rest = courses.filter(c => c !== main);
+    if (r.nested && rest.length) {
+      leads.push(t('pickerLeadNested', {
+        places: (main.items || []).length,
+        n: rest.length,
+      }));
+      appendCourseGroup(regions, t('courseGroupGu'));
+      if (main) appendCourseRow(regions, main);
+      appendCourseGroup(regions, t('courseGroupDong'));
+      rest.slice().sort((a, b) =>
+        courseLabel(a).localeCompare(courseLabel(b), LANG)).forEach(c => appendCourseRow(regions, c));
+    } else {
+      if (main) leads.push(t('pickerLeadSingle', { n: (main.items || []).length }));
+      courses.forEach(c => appendCourseRow(regions, c));
+    }
   }
+  if (lead) lead.textContent = leads[0] || '';
 }
 
 const TZ_COUNTRY = {
@@ -1947,6 +1923,14 @@ if (location.search.includes('rt=1')) {
   console.assert(countryStage('JP') === 'preview', 'admin-1 뿐이면 미리보기');
   console.assert(countryStage('XX') === 'preview', '모르는 나라도 미리보기로 떨어진다');
   console.assert(countryStage('ZZ') === 'preview', 'regions 가 없어도 터지지 않는다');
+
+  const bestKey = 'rt.best.__rt_test.z3';
+  const bestPrev = localStorage.getItem(bestKey);
+  localStorage.setItem(bestKey, '1200');
+  console.assert(courseBest('__rt_test') === 1200, '로컬 최고점');
+  console.assert(courseBest('__rt_missing') === 0, '없는 코스는 0');
+  if (bestPrev == null) localStorage.removeItem(bestKey);
+  else localStorage.setItem(bestKey, bestPrev);
 
   console.log('self-check done');
 }

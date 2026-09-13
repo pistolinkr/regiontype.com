@@ -243,9 +243,9 @@ seoul = {
             'id': 'seoul',
             'title': {'ko': '서울', 'en': 'Seoul', 'ja': 'ソウル'},
             'description': {
-                'ko': '한강이 가로지르는 수도. 25개 자치구부터 423개 행정동까지.',
-                'en': 'The capital on the Hangang. 25 districts, 423 dongs.',
-                'ja': '漢江が横切る首都。25自治区から423行政洞まで。',
+                'ko': '한강이 가로지르는 수도. 자치구 25곳, 구별 행정동 코스.',
+                'en': 'The capital on the Hangang. 25 districts, plus a dong course per district.',
+                'ja': '漢江が横切る首都。自治区25と区ごとの行政洞コース。',
             },
             'thumb': 'seoul-gu',
             'main': 'seoul-gu',
