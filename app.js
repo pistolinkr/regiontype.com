@@ -167,6 +167,7 @@ function go(id) {
   /* 타이틀 근접장이 고르는 판으로 넘어가도 점·색이 남는다. 타이틀을 떠나면 비운다. */
   if (id !== 'title') clearPixelHover();
   if (leavingPlay) snapshotPlay();
+  document.documentElement.dataset.screen = id;
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   if (id !== 'play') stop();
   requestAnimationFrame(() => requestAnimationFrame(syncGrid));

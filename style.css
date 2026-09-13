@@ -147,8 +147,8 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 .course-legend .is-play::before{background:var(--accent);opacity:1}
 .course-legend .is-soon::before{background:var(--block);opacity:.7}
 .course-stage{
-  flex:1;display:flex;flex-direction:column;align-items:stretch;
-  justify-content:flex-start;gap:12px;min-height:0;overflow:auto;
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;
+  justify-content:flex-start;gap:12px;
   width:min(560px,100%);
 }
 .course-list{
@@ -186,7 +186,11 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   box-shadow:inset 3px 0 0 #141414;
 }
 .course-row[data-kind="playable"] .course-row-status{color:#141414}
-.course-row[data-kind="soon"]{cursor:default}
+.course-row[data-kind="soon"]{
+  cursor:default;background:var(--card);
+  box-shadow:inset 3px 0 0 var(--block);
+  outline:1px solid var(--grid);outline-offset:-1px;
+}
 .course-row:focus-visible{outline:3px solid var(--accent-deep);outline-offset:3px}
 .course-row[data-kind="playable"]:focus-visible{outline-color:var(--ink)}
 @media (hover:hover) and (pointer:fine){
@@ -682,10 +686,14 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   z-index:-2;
   opacity:0; transition:opacity var(--slow) var(--ease-out);
 }
+/* 타이틀 히어로 맵이 고르는 판으로 미끄러지지 않게 — 장식 농도로 바로 내린다 */
+html[data-screen="regions"] #pixelmap,
+body:has(#regions.on) #pixelmap{transition:none}
 /* 타이틀에서만 또렷하다. 고르는 판에서는 장식 배경으로 내린다 */
-body:has(#title.on) #pixelmap{opacity:1}
-body:has(#regions.on) #pixelmap{opacity:.18}
-body:has(#regions.on) #pixelmap circle.hilite{fill:var(--block);opacity:.42}
+body:has(#title.on) #pixelmap,
+html[data-screen="title"] #pixelmap{opacity:1}
+body:has(#regions.on) #pixelmap,
+html[data-screen="regions"] #pixelmap{opacity:.14}
 /* 모바일 안내 화면에서는 .screen 을 숨겨도 픽셀맵은 화면 밖이라 따라 숨지
    않는다. 위 display:block 보다 뒤에 와야 이긴다 — 같은 특이도라 순서가 정한다 */
 @media (pointer:coarse),(max-width:640px){ #pixelmap{display:none} }
@@ -695,6 +703,12 @@ body:has(#regions.on) #pixelmap circle.hilite{fill:var(--block);opacity:.42}
   transition:transform var(--fast) var(--ease-out), fill var(--fast) var(--ease-out), opacity var(--fast) var(--ease-out);
 }
 #pixelmap circle.hilite{fill:var(--accent);opacity:1}
+html[data-screen="regions"] #pixelmap circle,
+html[data-screen="regions"] #pixelmap circle.hilite,
+body:has(#regions.on) #pixelmap circle,
+body:has(#regions.on) #pixelmap circle.hilite{
+  fill:var(--block);opacity:.28;transition:none;
+}
 .thumb svg circle{fill:#fff}
 
 /* ═══ UI 질감 ═══════════════════════════════════════════
