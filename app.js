@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = s => document.querySelector(s);
-const VER = '0.97';
+const VER = '0.98';
 const asset = p => p + (p.includes('?') ? '&' : '?') + 'v=' + VER;
 /* 설정 화면의 빌드 번호는 VER 에서 직접 읽는다. 손으로 적어두면 올릴 때마다
    맞춰야 할 자리가 하나 더 늘고, 언젠가 실제 빌드와 어긋난다. */
@@ -792,33 +792,26 @@ function courseStatus(slug) {
   return { kind: 'idle', label: t('statusIdle') };
 }
 
-function appendCourseGroup(list, label) {
+function appendCourseRow(list, spec) {
   const li = document.createElement('li');
-  li.className = 'course-group';
-  li.setAttribute('role', 'presentation');
-  li.textContent = label;
-  list.append(li);
-}
-
-function appendCourseRow(list, course) {
-  const st = courseStatus(course.slug);
-  const li = document.createElement('li');
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'course-row';
-  btn.dataset.slug = course.slug;
-  btn.dataset.status = st.kind;
+  const playable = spec.kind === 'playable';
+  const row = document.createElement(playable ? 'button' : 'div');
+  if (playable) row.type = 'button';
+  else row.setAttribute('aria-disabled', 'true');
+  row.className = 'course-row';
+  row.dataset.kind = spec.kind;
+  if (spec.slug) row.dataset.slug = spec.slug;
   const name = document.createElement('b');
-  name.textContent = courseLabel(course);
+  name.textContent = spec.name;
   const meta = document.createElement('span');
   meta.className = 'course-row-meta';
-  meta.textContent = t('places', { n: (course.items || []).length });
+  meta.textContent = t('countN', { n: spec.count });
   const status = document.createElement('em');
   status.className = 'course-row-status';
-  status.textContent = st.label;
-  btn.append(name, meta, status);
-  btn.addEventListener('click', () => start(course.slug));
-  li.append(btn);
+  status.textContent = spec.status;
+  row.append(name, meta, status);
+  if (playable && spec.slug) row.addEventListener('click', () => start(spec.slug));
+  li.append(row);
   list.append(li);
 }
 
@@ -834,28 +827,33 @@ async function renderRegions() {
   if (lead) lead.textContent = '';
   const pack = WORLD.countries.find(c => c.id === COUNTRY) || WORLD.countries[0];
   if (!pack) return;
-  const leads = [];
   for (const r of pack.regions) {
-    /* 고르는 판은 코스 이름·개수만 쓴다. 지도 도형은 받지 않는다. */
+    /* 고르는 판은 이름·개수 목록이다. 점 지도는 #pixelmap 장식만 쓴다. */
     const courses = await Promise.all(r.courses.map(loadCourse));
     const main = courses.find(c => c.slug === r.main) || courses[0];
-    const rest = courses.filter(c => c !== main);
-    if (r.nested && rest.length) {
-      leads.push(t('pickerLeadNested', {
-        places: (main.items || []).length,
-        n: rest.length,
-      }));
-      appendCourseGroup(regions, t('courseGroupGu'));
-      if (main) appendCourseRow(regions, main);
-      appendCourseGroup(regions, t('courseGroupDong'));
-      rest.slice().sort((a, b) =>
-        courseLabel(a).localeCompare(courseLabel(b), LANG)).forEach(c => appendCourseRow(regions, c));
+    if (!main) continue;
+    const n = (main.items || []).length;
+    if (r.nested) {
+      if (lead && !lead.textContent) lead.textContent = t('pickerLeadPlayable');
+      appendCourseRow(regions, {
+        kind: 'playable', slug: main.slug,
+        name: t('courseSeoulGu'), count: n, status: t('statusDefault'),
+      });
+      /* 한강 이남 11 · 이북 14 — 25 자치구를 가르는 자리. 아직 코스가 없다. */
+      appendCourseRow(regions, {
+        kind: 'soon', name: t('courseHangangSouth'), count: 11, status: t('statusSoon'),
+      });
+      appendCourseRow(regions, {
+        kind: 'soon', name: t('courseHangangNorth'), count: 14, status: t('statusSoon'),
+      });
     } else {
-      if (main) leads.push(t('pickerLeadSingle', { n: (main.items || []).length }));
-      courses.forEach(c => appendCourseRow(regions, c));
+      if (lead && !lead.textContent) lead.textContent = t('pickerLeadSingle', { n });
+      appendCourseRow(regions, {
+        kind: 'playable', slug: main.slug,
+        name: courseLabel(main), count: n, status: t('statusDefault'),
+      });
     }
   }
-  if (lead) lead.textContent = leads[0] || '';
 }
 
 const TZ_COUNTRY = {

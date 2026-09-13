@@ -44,7 +44,7 @@
     "hintOff": "숨김",
     "startPlay": "시작",
     "timeLimit": "제한 시간",
-    "pickCourse": "코스 고르기",
+    "pickCourse": "코스 선택",
     "rankTab": "순위",
     "cardView": "카드 보기",
     "prevCourse": "이전 코스",
@@ -104,7 +104,14 @@
     "pickerLeadNested": "자치구 {places}곳을 치는 코스 하나, 구별 행정동 코스 {n}개.",
     "pickerLeadSingle": "이 코스에서 {n}곳을 칩니다.",
     "courseGroupGu": "자치구",
-    "courseGroupDong": "행정동"
+    "courseGroupDong": "행정동",
+    "pickerLeadPlayable": "지금 플레이 가능: 서울 25개 자치구",
+    "courseSeoulGu": "서울 자치구",
+    "courseHangangSouth": "한강 이남",
+    "courseHangangNorth": "한강 이북",
+    "statusDefault": "기본",
+    "statusSoon": "준비중",
+    "countN": "{n}개"
   },
   "en": {
     "start": "Play",
@@ -151,7 +158,7 @@
     "hintOff": "Off",
     "startPlay": "Start",
     "timeLimit": "Time limit",
-    "pickCourse": "Pick a course",
+    "pickCourse": "Choose a course",
     "rankTab": "Ranks",
     "cardView": "Card view",
     "prevCourse": "Previous course",
@@ -211,7 +218,14 @@
     "pickerLeadNested": "One course of {places} districts, plus {n} per-district dong courses.",
     "pickerLeadSingle": "This course has {n} places.",
     "courseGroupGu": "Districts",
-    "courseGroupDong": "Dong courses"
+    "courseGroupDong": "Dong courses",
+    "pickerLeadPlayable": "Playable now: Seoul’s 25 districts",
+    "courseSeoulGu": "Seoul districts",
+    "courseHangangSouth": "South of the Hangang",
+    "courseHangangNorth": "North of the Hangang",
+    "statusDefault": "Default",
+    "statusSoon": "Coming soon",
+    "countN": "{n}"
   },
   "ja": {
     "start": "はじめる",
@@ -318,7 +332,14 @@
     "pickerLeadNested": "自治区{places}か所のコース1つと、区ごとの行政洞コース{n}。",
     "pickerLeadSingle": "このコースは{n}か所です。",
     "courseGroupGu": "自治区",
-    "courseGroupDong": "行政洞"
+    "courseGroupDong": "行政洞",
+    "pickerLeadPlayable": "いま遊べる：ソウル自治区25",
+    "courseSeoulGu": "ソウル自治区",
+    "courseHangangSouth": "漢江の南",
+    "courseHangangNorth": "漢江の北",
+    "statusDefault": "基本",
+    "statusSoon": "準備中",
+    "countN": "{n}"
   },
   "de": {
     "start": "Spielen",
@@ -425,7 +446,14 @@
     "pickerLeadNested": "Ein Kurs mit {places} Bezirken und {n} Dong-Kurse pro Bezirk.",
     "pickerLeadSingle": "In diesem Kurs {n} Orte.",
     "courseGroupGu": "Bezirke",
-    "courseGroupDong": "Dong-Kurse"
+    "courseGroupDong": "Dong-Kurse",
+    "pickerLeadPlayable": "Spielbar: 25 Bezirke von Seoul",
+    "courseSeoulGu": "Seoul Bezirke",
+    "courseHangangSouth": "Südlich des Hangang",
+    "courseHangangNorth": "Nördlich des Hangang",
+    "statusDefault": "Standard",
+    "statusSoon": "Demnächst",
+    "countN": "{n}"
   },
   "fr": {
     "start": "Jouer",
@@ -532,7 +560,14 @@
     "pickerLeadNested": "Un parcours de {places} arrondissements, plus {n} parcours dong.",
     "pickerLeadSingle": "Ce parcours compte {n} lieux.",
     "courseGroupGu": "Arrondissements",
-    "courseGroupDong": "Parcours dong"
+    "courseGroupDong": "Parcours dong",
+    "pickerLeadPlayable": "Jouable : 25 arrondissements de Séoul",
+    "courseSeoulGu": "Arrondissements de Séoul",
+    "courseHangangSouth": "Sud du Hangang",
+    "courseHangangNorth": "Nord du Hangang",
+    "statusDefault": "Par défaut",
+    "statusSoon": "Bientôt",
+    "countN": "{n}"
   },
   "es": {
     "start": "Jugar",
@@ -639,7 +674,14 @@
     "pickerLeadNested": "Un curso de {places} distritos, más {n} cursos dong.",
     "pickerLeadSingle": "Este curso tiene {n} lugares.",
     "courseGroupGu": "Distritos",
-    "courseGroupDong": "Cursos dong"
+    "courseGroupDong": "Cursos dong",
+    "pickerLeadPlayable": "Jugable: 25 distritos de Seúl",
+    "courseSeoulGu": "Distritos de Seúl",
+    "courseHangangSouth": "Sur del Hangang",
+    "courseHangangNorth": "Norte del Hangang",
+    "statusDefault": "Predeterminado",
+    "statusSoon": "Pronto",
+    "countN": "{n}"
   },
   "pt": {
     "start": "Jogar",
@@ -746,7 +788,14 @@
     "pickerLeadNested": "Um curso de {places} distritos, mais {n} cursos dong.",
     "pickerLeadSingle": "Este curso tem {n} lugares.",
     "courseGroupGu": "Distritos",
-    "courseGroupDong": "Cursos dong"
+    "courseGroupDong": "Cursos dong",
+    "pickerLeadPlayable": "Jogável: 25 distritos de Seul",
+    "courseSeoulGu": "Distritos de Seul",
+    "courseHangangSouth": "Sul do Hangang",
+    "courseHangangNorth": "Norte do Hangang",
+    "statusDefault": "Padrão",
+    "statusSoon": "Em breve",
+    "countN": "{n}"
   },
   "zh": {
     "start": "开始",
@@ -853,7 +902,14 @@
     "pickerLeadNested": "一个 {places} 个自治区课程，外加 {n} 个行政洞课程。",
     "pickerLeadSingle": "本课程有 {n} 个地点。",
     "courseGroupGu": "自治区",
-    "courseGroupDong": "行政洞"
+    "courseGroupDong": "行政洞",
+    "pickerLeadPlayable": "现在可玩：首尔 25 个自治区",
+    "courseSeoulGu": "首尔自治区",
+    "courseHangangSouth": "汉江南岸",
+    "courseHangangNorth": "汉江北岸",
+    "statusDefault": "默认",
+    "statusSoon": "即将推出",
+    "countN": "{n}个"
   },
   "it": {
     "start": "Gioca",
@@ -960,7 +1016,14 @@
     "pickerLeadNested": "Un percorso di {places} distretti, più {n} percorsi dong.",
     "pickerLeadSingle": "Questo percorso ha {n} luoghi.",
     "courseGroupGu": "Distretti",
-    "courseGroupDong": "Percorsi dong"
+    "courseGroupDong": "Percorsi dong",
+    "pickerLeadPlayable": "Giocabile: 25 distretti di Seul",
+    "courseSeoulGu": "Distretti di Seul",
+    "courseHangangSouth": "Sud del Hangang",
+    "courseHangangNorth": "Nord del Hangang",
+    "statusDefault": "Predefinito",
+    "statusSoon": "Prossimamente",
+    "countN": "{n}"
   },
   "nl": {
     "start": "Spelen",
@@ -1067,7 +1130,14 @@
     "pickerLeadNested": "Eén parcours van {places} districten, plus {n} dong-parcours.",
     "pickerLeadSingle": "Dit parcours heeft {n} plaatsen.",
     "courseGroupGu": "Districten",
-    "courseGroupDong": "Dong-parcours"
+    "courseGroupDong": "Dong-parcours",
+    "pickerLeadPlayable": "Speelbaar: 25 districten van Seoel",
+    "courseSeoulGu": "Seoel-districten",
+    "courseHangangSouth": "Zuid van de Hangang",
+    "courseHangangNorth": "Noord van de Hangang",
+    "statusDefault": "Standaard",
+    "statusSoon": "Binnenkort",
+    "countN": "{n}"
   },
   "pl": {
     "start": "Graj",
@@ -1174,7 +1244,14 @@
     "pickerLeadNested": "Jeden kurs {places} dzielnic oraz {n} kursów dong.",
     "pickerLeadSingle": "Ten kurs ma {n} miejsc.",
     "courseGroupGu": "Dzielnice",
-    "courseGroupDong": "Kursy dong"
+    "courseGroupDong": "Kursy dong",
+    "pickerLeadPlayable": "Dostępne: 25 dzielnic Seulu",
+    "courseSeoulGu": "Dzielnice Seulu",
+    "courseHangangSouth": "Południe Hangang",
+    "courseHangangNorth": "Północ Hangang",
+    "statusDefault": "Domyślny",
+    "statusSoon": "Wkrótce",
+    "countN": "{n}"
   },
   "cs": {
     "start": "Hrát",
@@ -1281,7 +1358,14 @@
     "pickerLeadNested": "Jeden kurz {places} obvodů a {n} kurzů dong.",
     "pickerLeadSingle": "Tento kurz má {n} míst.",
     "courseGroupGu": "Obvody",
-    "courseGroupDong": "Kurzy dong"
+    "courseGroupDong": "Kurzy dong",
+    "pickerLeadPlayable": "Hratelné: 25 obvodů Soulu",
+    "courseSeoulGu": "Obvody Soulu",
+    "courseHangangSouth": "Jih Hangang",
+    "courseHangangNorth": "Sever Hangang",
+    "statusDefault": "Výchozí",
+    "statusSoon": "Již brzy",
+    "countN": "{n}"
   },
   "sv": {
     "start": "Spela",
@@ -1388,7 +1472,14 @@
     "pickerLeadNested": "En bana med {places} distrikt plus {n} dong-banor.",
     "pickerLeadSingle": "Den här banan har {n} platser.",
     "courseGroupGu": "Distrikt",
-    "courseGroupDong": "Dong-banor"
+    "courseGroupDong": "Dong-banor",
+    "pickerLeadPlayable": "Spelbart: Seouls 25 distrikt",
+    "courseSeoulGu": "Seouls distrikt",
+    "courseHangangSouth": "Söder om Hangang",
+    "courseHangangNorth": "Norr om Hangang",
+    "statusDefault": "Standard",
+    "statusSoon": "Kommer snart",
+    "countN": "{n}"
   },
   "nb": {
     "start": "Spill",
@@ -1495,7 +1586,14 @@
     "pickerLeadNested": "Én bane med {places} distrikter pluss {n} dong-baner.",
     "pickerLeadSingle": "Denne banen har {n} steder.",
     "courseGroupGu": "Distrikter",
-    "courseGroupDong": "Dong-baner"
+    "courseGroupDong": "Dong-baner",
+    "pickerLeadPlayable": "Spillbart: Seouls 25 distrikter",
+    "courseSeoulGu": "Seouls distrikter",
+    "courseHangangSouth": "Sør for Hangang",
+    "courseHangangNorth": "Nord for Hangang",
+    "statusDefault": "Standard",
+    "statusSoon": "Kommer snart",
+    "countN": "{n}"
   },
   "fi": {
     "start": "Pelaa",
@@ -1602,7 +1700,14 @@
     "pickerLeadNested": "Yksi {places} alueen rata ja {n} dong-rataa.",
     "pickerLeadSingle": "Tällä radalla on {n} paikkaa.",
     "courseGroupGu": "Alueet",
-    "courseGroupDong": "Dong-radat"
+    "courseGroupDong": "Dong-radat",
+    "pickerLeadPlayable": "Pelattavissa: Soulin 25 aluetta",
+    "courseSeoulGu": "Soulin alueet",
+    "courseHangangSouth": "Hangangin eteläpuoli",
+    "courseHangangNorth": "Hangangin pohjoispuoli",
+    "statusDefault": "Oletus",
+    "statusSoon": "Tulossa",
+    "countN": "{n}"
   },
   "uk": {
     "start": "Грати",
@@ -1709,7 +1814,14 @@
     "pickerLeadNested": "Один курс з {places} районів плюс {n} курсів дон.",
     "pickerLeadSingle": "У цьому курсі {n} місць.",
     "courseGroupGu": "Райони",
-    "courseGroupDong": "Курси дон"
+    "courseGroupDong": "Курси дон",
+    "pickerLeadPlayable": "Доступно: 25 районів Сеула",
+    "courseSeoulGu": "Райони Сеула",
+    "courseHangangSouth": "Південь Хангану",
+    "courseHangangNorth": "Північ Хангану",
+    "statusDefault": "Типовий",
+    "statusSoon": "Незабаром",
+    "countN": "{n}"
   },
   "ro": {
     "start": "Joacă",
@@ -1816,7 +1928,14 @@
     "pickerLeadNested": "Un traseu de {places} districte plus {n} trasee dong.",
     "pickerLeadSingle": "Acest traseu are {n} locuri.",
     "courseGroupGu": "Districte",
-    "courseGroupDong": "Trasee dong"
+    "courseGroupDong": "Trasee dong",
+    "pickerLeadPlayable": "Jucabil: 25 de districte din Seul",
+    "courseSeoulGu": "Districtele Seulului",
+    "courseHangangSouth": "Sudul Hangang",
+    "courseHangangNorth": "Nordul Hangang",
+    "statusDefault": "Implicit",
+    "statusSoon": "În curând",
+    "countN": "{n}"
   },
   "hu": {
     "start": "Játék",
@@ -1923,7 +2042,14 @@
     "pickerLeadNested": "Egy {places} kerületes kör, plusz {n} dong kör.",
     "pickerLeadSingle": "Ebben a körben {n} hely van.",
     "courseGroupGu": "Kerületek",
-    "courseGroupDong": "Dong körök"
+    "courseGroupDong": "Dong körök",
+    "pickerLeadPlayable": "Játszható: Szöul 25 kerülete",
+    "courseSeoulGu": "Szöuli kerületek",
+    "courseHangangSouth": "Hangang dél",
+    "courseHangangNorth": "Hangang észak",
+    "statusDefault": "Alap",
+    "statusSoon": "Hamarosan",
+    "countN": "{n}"
   },
   "bg": {
     "start": "Играй",
@@ -2030,7 +2156,14 @@
     "pickerLeadNested": "Един курс с {places} района плюс {n} курса dong.",
     "pickerLeadSingle": "Този курс има {n} места.",
     "courseGroupGu": "Райони",
-    "courseGroupDong": "Курсове dong"
+    "courseGroupDong": "Курсове dong",
+    "pickerLeadPlayable": "Играе се: 25 района на Сеул",
+    "courseSeoulGu": "Райони на Сеул",
+    "courseHangangSouth": "Юг от Ханган",
+    "courseHangangNorth": "Север от Ханган",
+    "statusDefault": "Основен",
+    "statusSoon": "Очаквайте",
+    "countN": "{n}"
   },
   "el": {
     "start": "Παίξε",
@@ -2137,7 +2270,14 @@
     "pickerLeadNested": "Μία διαδρομή {places} περιοχών και {n} διαδρομές dong.",
     "pickerLeadSingle": "Αυτή η διαδρομή έχει {n} τοποθεσίες.",
     "courseGroupGu": "Περιοχές",
-    "courseGroupDong": "Διαδρομές dong"
+    "courseGroupDong": "Διαδρομές dong",
+    "pickerLeadPlayable": "Διαθέσιμο: 25 περιοχές της Σεούλ",
+    "courseSeoulGu": "Περιοχές Σεούλ",
+    "courseHangangSouth": "Νότια του Χανγκάνγκ",
+    "courseHangangNorth": "Βόρεια του Χανγκάνγκ",
+    "statusDefault": "Προεπιλογή",
+    "statusSoon": "Σύντομα",
+    "countN": "{n}"
   },
   "tr": {
     "start": "Oyna",
@@ -2244,7 +2384,14 @@
     "pickerLeadNested": "{places} ilçelik bir parkur ve {n} dong parkuru.",
     "pickerLeadSingle": "Bu parkurda {n} yer var.",
     "courseGroupGu": "İlçeler",
-    "courseGroupDong": "Dong parkurları"
+    "courseGroupDong": "Dong parkurları",
+    "pickerLeadPlayable": "Oynanabilir: Seul’un 25 ilçesi",
+    "courseSeoulGu": "Seul ilçeleri",
+    "courseHangangSouth": "Hangang güneyi",
+    "courseHangangNorth": "Hangang kuzeyi",
+    "statusDefault": "Varsayılan",
+    "statusSoon": "Yakında",
+    "countN": "{n}"
   },
   "vi": {
     "start": "Chơi",
@@ -2351,7 +2498,14 @@
     "pickerLeadNested": "Một lộ trình {places} quận, cộng {n} lộ trình phường/xã.",
     "pickerLeadSingle": "Lộ trình này có {n} nơi.",
     "courseGroupGu": "Quận",
-    "courseGroupDong": "Lộ trình phường"
+    "courseGroupDong": "Lộ trình phường",
+    "pickerLeadPlayable": "Chơi được: 25 quận Seoul",
+    "courseSeoulGu": "Quận Seoul",
+    "courseHangangSouth": "Nam sông Hán",
+    "courseHangangNorth": "Bắc sông Hán",
+    "statusDefault": "Mặc định",
+    "statusSoon": "Sắp có",
+    "countN": "{n}"
   },
   "th": {
     "start": "เล่น",
@@ -2458,7 +2612,14 @@
     "pickerLeadNested": "คอร์สเขต {places} ที่ และคอร์สระดับตำบล {n} คอร์ส",
     "pickerLeadSingle": "คอร์สนี้มี {n} ที่",
     "courseGroupGu": "เขต",
-    "courseGroupDong": "คอร์สตำบล"
+    "courseGroupDong": "คอร์สตำบล",
+    "pickerLeadPlayable": "เล่นได้ตอนนี้: 25 เขตโซล",
+    "courseSeoulGu": "เขตโซล",
+    "courseHangangSouth": "ใต้แม่น้ำฮัน",
+    "courseHangangNorth": "เหนือแม่น้ำฮัน",
+    "statusDefault": "หลัก",
+    "statusSoon": "เร็วๆ นี้",
+    "countN": "{n}"
   },
   "id": {
     "start": "Main",
@@ -2565,7 +2726,14 @@
     "pickerLeadNested": "Satu kursus {places} distrik, plus {n} kursus kecamatan.",
     "pickerLeadSingle": "Kursus ini punya {n} tempat.",
     "courseGroupGu": "Distrik",
-    "courseGroupDong": "Kursus kecamatan"
+    "courseGroupDong": "Kursus kecamatan",
+    "pickerLeadPlayable": "Bisa dimainkan: 25 distrik Seoul",
+    "courseSeoulGu": "Distrik Seoul",
+    "courseHangangSouth": "Selatan Hangang",
+    "courseHangangNorth": "Utara Hangang",
+    "statusDefault": "Utama",
+    "statusSoon": "Segera",
+    "countN": "{n}"
   },
   "ms": {
     "start": "Main",
@@ -2672,7 +2840,14 @@
     "pickerLeadNested": "Satu kursus {places} daerah, plus {n} kursus mukim.",
     "pickerLeadSingle": "Kursus ini ada {n} tempat.",
     "courseGroupGu": "Daerah",
-    "courseGroupDong": "Kursus mukim"
+    "courseGroupDong": "Kursus mukim",
+    "pickerLeadPlayable": "Boleh dimainkan: 25 daerah Seoul",
+    "courseSeoulGu": "Daerah Seoul",
+    "courseHangangSouth": "Selatan Hangang",
+    "courseHangangNorth": "Utara Hangang",
+    "statusDefault": "Utama",
+    "statusSoon": "Akan datang",
+    "countN": "{n}"
   },
   "ar": {
     "start": "ابدأ",
@@ -2779,6 +2954,13 @@
     "pickerLeadNested": "مسار واحد من {places} منطقة، بالإضافة إلى {n} مسار dong.",
     "pickerLeadSingle": "هذا المسار فيه {n} مكان.",
     "courseGroupGu": "المناطق",
-    "courseGroupDong": "مسارات dong"
+    "courseGroupDong": "مسارات dong",
+    "pickerLeadPlayable": "متاح الآن: 25 منطقة في سيول",
+    "courseSeoulGu": "مناطق سيول",
+    "courseHangangSouth": "جنوب الهان",
+    "courseHangangNorth": "شمال الهان",
+    "statusDefault": "افتراضي",
+    "statusSoon": "قريبًا",
+    "countN": "{n}"
   }
 }
