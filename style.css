@@ -156,6 +156,7 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   width:100%;gap:12px;padding:0 0 24px;
 }
 .course-list li{display:block;position:relative}
+.course-card-item{margin-top:28px;width:230px;padding-left:62px;isolation:isolate}
 .course-list li[hidden]{display:none}
 .course-row{
   width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;
@@ -198,8 +199,8 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 }
 
 /* 고르는 판 — 카드 뒷면. 지도가 남는 높이를 다 갖는다 */
-.pickmap{flex:1;min-height:0;display:grid;place-items:center;margin:8px 0 2px}
-.pickmap svg{width:100%;height:100%;display:block}
+.pickmap{flex:1;min-height:0;display:grid;place-items:center;margin:8px 0 2px;overflow:hidden}
+.pickmap svg{width:100%;height:100%;display:block;overflow:hidden}
 .pickmap circle{fill:var(--block);transition:fill var(--fast) var(--ease-out)}
 .pickmap .hit{fill:none;pointer-events:all}
 .gu{cursor:pointer}
@@ -235,6 +236,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   width:100%;display:flex;flex-direction:column;
   backface-visibility:hidden;
 }
+/* 미리보기 HUD 의 시간 드럼이 카드 overflow 에 잘리지 않게 */
+.card[data-preview="1"] .card-back{overflow:visible}
+.ov-hud,.ov-hud .stat.time{overflow:visible;z-index:5}
 .card-front{cursor:pointer}
 .card-back{
   position:absolute;inset:0;transform:rotateY(180deg);
@@ -269,9 +273,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
    카드의 형제다: 카드 안에 두면 카드가 제 안쪽을 잘라내 밖으로 못 나가고,
    카드와 함께 돌아 좌우까지 뒤집힌다. z-index 로 카드 밑에 깔아 물린 모양을 낸다. */
 .rail{
-  position:absolute;left:0;top:20%;z-index:0;
+  position:absolute;left:0;top:20%;z-index:4;
   display:flex;flex-direction:column;gap:6px;
-  translate:calc(-100% + 15px) 0;
+  translate:calc(-100% + 4px) 0;
   opacity:0;pointer-events:none;
   transition:opacity var(--fast) var(--ease-out);
 }
@@ -283,15 +287,15 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   width:58px;height:52px;box-sizing:border-box;padding-left:13px;
   display:grid;align-items:center;justify-items:start;cursor:pointer;
   border:0;border-radius:9px 0 0 9px;
-  background:var(--block-hi);color:#fff;
+  background:var(--card);color:var(--ink-soft);
+  box-shadow:inset -2px 0 0 var(--grid);
   transition:background var(--fast) var(--ease-out),
              color var(--fast) var(--ease-out),
              translate var(--fast) var(--ease-out);
 }
 .rail-b .i{width:22px;height:22px}
-/* 고른 탭은 카드와 같은 색이 되어 카드에 이어 붙은 한 장으로 읽힌다.
-   색만으로 가르지 않도록 왼쪽으로 더 나와 모양으로도 갈린다 */
-.rail-b[aria-selected="true"]{background:var(--card);color:var(--ink);translate:-7px 0}
+/* 고른 탭이 주황·앞으로. 예전엔 고른 탭이 카드색이라 안 고른 탭이 켜져 보였다 */
+.rail-b[aria-selected="true"]{background:var(--accent);color:#141414;translate:-7px 0;box-shadow:none}
 .rail-b:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 /* 탭을 넘길 때 칸이 모로 섰다가 돌아온다 — 카드의 다른 면을 넘긴 것으로 읽히게 */
 .card-back{perspective:900px}
@@ -356,7 +360,7 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 }
 .card[data-preview="1"] .ov-game{opacity:1;transform:none}
 .ov-game{flex:1;min-height:0;display:flex;flex-direction:column;text-align:left}
-.ov-hud{margin-bottom:4px;gap:14px;position:relative;z-index:3}
+.ov-hud{margin-bottom:4px;gap:14px;position:relative;z-index:5;overflow:visible}
 .ov-body{flex:1;min-height:0;display:flex;align-items:stretch}
 .ov-stage{flex:1;min-height:0;position:relative}
 .ov-map{width:100%;height:100%;display:block}
@@ -636,7 +640,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 /* ── 모바일 안내 ───────────────────────── */
 #mobile{display:none;position:fixed;inset:0;place-content:center;text-align:center;padding:32px;gap:20px}
 #mobile p{color:var(--ink-soft);line-height:1.7}
-@media (pointer:coarse),(max-width:640px){
+/* 물리 키보드가 없는 기기만 가린다. 폭으로 가르면 좁힌 데스크톱에서
+   코스 목록까지 사라진다 — pointer:coarse 가 그 갈림이다 */
+@media (pointer:coarse){
   .screen{display:none!important}
   #mobile{display:grid}
 }

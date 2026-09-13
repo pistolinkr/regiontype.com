@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = s => document.querySelector(s);
-const VER = '0.99';
+const VER = '1.00';
 const asset = p => p + (p.includes('?') ? '&' : '?') + 'v=' + VER;
 /* 설정 화면의 빌드 번호는 VER 에서 직접 읽는다. 손으로 적어두면 올릴 때마다
    맞춰야 할 자리가 하나 더 늘고, 언젠가 실제 빌드와 어긋난다. */
@@ -264,9 +264,10 @@ document.addEventListener('click', e => {
   const drum = document.querySelector('.wheel[data-on]');
   if (drum && !drum.closest('.stat.time').contains(e.target)) closeWheel(drum);
   const open = document.querySelector('.card[data-flip="true"]');
-  /* 카드탭은 카드의 형제라 카드 안에 없다. 탭을 누른 것도 카드 안을 누른 것이다 —
-     이걸 빼먹으면 탭을 누를 때마다 '바깥을 눌렀다'로 읽혀 카드가 닫힌다. */
-  if (open && !open.contains(e.target) && !open.parentElement.contains(e.target))
+  /* 접기는 카드·레일 밖이다. li 전체로 보면 지도 .hit 가 카드 밖으로
+     새어 나와도 '안'으로 읽혀 접히지 않는다. */
+  const rail = open && open.parentElement && open.parentElement.querySelector(':scope > .rail');
+  if (open && !open.contains(e.target) && !(rail && rail.contains(e.target)))
     flip(open, false);
   const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go);
   const tog = e.target.closest('.toggle');
@@ -478,10 +479,12 @@ function flip(card, open) {
   if (!open) {
     const wasPreview = card.dataset.preview === '1';
     card.removeAttribute('data-preview');
+    card.removeAttribute('data-rank');
     lockUntilSettled(card, wasPreview ? card._resetPick : null);
     card.querySelector('.card-front').focus();
     return;
   }
+  if (card._markRail) card._markRail(false);
   const play = card.querySelector('.ov-play');
   const focus = (play && !play.hidden && card.querySelector('.ov-start'))
     || card.querySelector('.ov-start');
@@ -639,6 +642,17 @@ function wireRegionBack(card, back, courses, rail) {
    결과 화면의 순위표는 판이 끝나야 보인다. 여기선 치기 전에 남들이 어디쯤
    몰려 있는지를 먼저 본다 — 겨룰 상대가 보여야 겨룰 마음이 든다.
    판은 (코스, 제한 시간) 이라 화살표로 코스를 넘기고 시간은 설정을 따른다. */
+function rankStatusCopy(dist, joined) {
+  if (dist.score !== null)
+    return t('rankYou', {
+      pct: Math.max(1, Math.round((dist.over + 1) / dist.total * 100)),
+      total: dist.total, rank: dist.over + 1,
+    });
+  if (!joined) return t('rankNeedName');
+  if (dist.total) return t('rankOthers', { n: dist.total });
+  return t('rankEmpty');
+}
+
 function wireRank(card, back, courses, showPick, rail) {
   const pane = back.querySelector('.ov-rank');
   const pick = back.querySelector('.ov-pick');
@@ -684,26 +698,22 @@ function wireRank(card, back, courses, showPick, rail) {
     if (!FEEDBACK_URL) return say(t('noBoard'), true);
     try {
       const play = { c: c.slug, t: opt.time };
-      const [d, t] = await Promise.all([
+      const [dist, top] = await Promise.all([
         boardAsk('/dist', { ...play }),
         boardAsk(`/top?c=${encodeURIComponent(play.c)}&t=${play.t}`),
       ]);
       if (n !== gen) return;
-      plot(d);
-      drawRanks(t.top || [], list);
+      plot(dist);
+      drawRanks(top.top || [], list);
       /* 등수는 서버가 센 값으로만 적는다. 막대에서 눈대중한 자리를 숫자로 적으면
          보이는 것과 실제가 어긋난다. */
       /* 판이 빈 것과 내가 안 올린 것은 다른 말이다. 이름을 안 적었으면 그 말을
          해줘야 한다 — 안 그러면 한 판 치고 와서 "아직 아무도" 를 보고
-         순위표가 고장났다고 읽는다. */
+         순위표가 고장났다고 읽는다.
+         응답 이름을 t 로 받으면 i18n t() 를 가려 빈 판 문구가 깨진다. */
       const joined = !!localStorage.getItem(NAME_KEY);
-      pane.querySelector('.rank-you').textContent = d.score !== null
-        ? t('rankYou', { pct: Math.max(1, Math.round((d.over + 1) / d.total * 100)),
-                         total: d.total, rank: d.over + 1 })
-        : !joined ? t('rankNeedName')
-        : d.total ? t('rankOthers', { n: d.total })
-        : t('rankEmpty');
-      if (d.score !== null) pane.querySelector('.rank-score').textContent = d.score + t('scoreUnit');
+      pane.querySelector('.rank-you').textContent = rankStatusCopy(dist, joined);
+      if (dist.score !== null) pane.querySelector('.rank-score').textContent = dist.score + t('scoreUnit');
       say('');
     } catch { if (n === gen) say(t('rankFail'), true); }
   }
@@ -716,8 +726,11 @@ function wireRank(card, back, courses, showPick, rail) {
     [{ transform: `rotateY(${from}deg)` }, { transform: `rotateY(${to}deg)` }],
     { duration: ms, easing: 'cubic-bezier(.77,0,.175,1)', fill: 'both' });
 
-  const mark = on => rail.querySelectorAll('.rail-b').forEach(b =>
-    b.setAttribute('aria-selected', (b.dataset.pane === 'rank') === on));
+  const mark = on => rail.querySelectorAll('.rail-b').forEach(b => {
+    const sel = on ? b.dataset.pane === 'rank' : b.dataset.pane === 'pick';
+    b.setAttribute('aria-selected', String(sel));
+  });
+  card._markRail = mark;
 
   let turning = false;
   const open = async on => {
@@ -764,16 +777,28 @@ function wireRank(card, back, courses, showPick, rail) {
   };
 }
 
+function dismissCard(card) {
+  const drum = card.querySelector('.wheel[data-on]');
+  if (drum) closeWheel(drum);
+  card.removeAttribute('data-preview');
+  card.removeAttribute('data-rank');
+  if (card._resetPick) card._resetPick();
+  const pane = card.querySelector('.ov-rank');
+  const pick = card.querySelector('.ov-pick');
+  if (pane) pane.hidden = true;
+  if (pick) pick.hidden = false;
+  if (card._markRail) card._markRail(false);
+  if (card.dataset.flip === 'true') flip(card, false);
+}
+
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const drum = document.querySelector('.wheel[data-on]');
   if (drum) { closeWheel(drum); return; }
   const open = document.querySelector('.card[data-flip="true"]');
   if (!open) return;
-  if (open._closeRank && open._closeRank()) return;
-  const play = open.querySelector('.ov-play');
-  if (play && !play.hidden && open._showPick) { open._showPick(); return; }
-  flip(open, false);
+  e.preventDefault();
+  dismissCard(open);
 });
 
 /* ── 코스 로드 ──────────────────────────────────────── */
@@ -888,6 +913,93 @@ function appendCourseRow(list, spec) {
   list.append(li);
 }
 
+async function appendRegionCard(list, pack, r, courses, main) {
+  const geom = await loadGeom(r.thumb);
+  const li = document.createElement('li');
+  li.className = 'course-card-item';
+  li.innerHTML = `<div class="card" data-flip="false">
+      <button type="button" class="card-face card-front" aria-expanded="false">
+        <span class="card-top"><span class="thumb"></span></span>
+        <span class="card-body"><b></b><em></em><span class="desc"></span></span>
+      </button>
+    </div>
+    <div class="rail" role="tablist" aria-label="${t('cardView')}">
+      <button type="button" class="rail-b" data-pane="pick" role="tab" aria-selected="true">
+        <i class="i i-pin" aria-hidden="true"></i><span class="sr">${t('pickCourse')}</span>
+      </button>
+      <button type="button" class="rail-b" data-pane="rank" role="tab" aria-selected="false">
+        <i class="i i-chart" aria-hidden="true"></i><span class="sr">${t('rankTab')}</span>
+      </button>
+    </div>`;
+  const thumb = li.querySelector('.thumb');
+  const drawThumb = () => { thumb.innerHTML = thumbSvg(geom); };
+  REDRAW.push(drawThumb); regionRedraw.push(drawThumb); drawThumb();
+  const title = loc(r.title) || countryName(pack.id);
+  li.querySelector('.card-body b').textContent = title;
+  /* 26개 코스·423동으로 읽히지 않게 — 목록과 같은 25 자치구만 적는다 */
+  const n = (main.items || []).length;
+  li.querySelector('.card-body em').textContent = t('countN', { n }) + ' · ' + t('rankTab');
+  li.querySelector('.desc').textContent = loc(r.description) || t('places', { n });
+
+  const card = li.querySelector('.card');
+  const back = $('#regionTpl').content.firstElementChild.cloneNode(true);
+  back.classList.add('card-face');
+  card.append(back);
+  back.inert = true;
+
+  const bySlug = new Map(courses.map(c => [c.slug, c]));
+  const byGu = new Map();
+  courses.forEach(c => {
+    const m = /^(\S+구)\s/.exec(c.title);
+    if (m && c.slug.endsWith('-dong')) byGu.set(m[1], c.slug);
+  });
+
+  const pane = back.querySelector('.pickmap');
+  const drawPick = () => {
+    pane.innerHTML = pickMapSvg(geom);
+    pane.querySelectorAll('.gu').forEach(g => {
+      const slug = r.nested && byGu.get(g.dataset.gu);
+      if (slug) g.dataset.slug = slug;
+      else if (r.nested) {
+        g.classList.add('off'); g.removeAttribute('tabindex'); g.removeAttribute('role');
+      }
+    });
+  };
+  REDRAW.push(drawPick); regionRedraw.push(drawPick); drawPick();
+
+  const name = back.querySelector('.pickname');
+  const idle = r.nested ? t('idleNested') : t('idleAdmin');
+  name.dataset.idle = idle;
+  name.textContent = idle;
+  const tell = g => {
+    if (!g) { name.textContent = idle; return; }
+    const c = g.dataset.slug && bySlug.get(g.dataset.slug);
+    if (c) name.textContent = `${c.title} · ${t('places', { n: c.items.length })}`;
+    else if (g.dataset.gu) name.textContent = g.dataset.gu;
+    else name.textContent = idle;
+  };
+  pane.addEventListener('pointerover', e => tell(e.target.closest('.gu')));
+  pane.addEventListener('pointerout', () => tell(null));
+  pane.addEventListener('keyup', e => {
+    const g = e.target.closest && e.target.closest('.gu');
+    if (g) tell(g);
+  });
+  pane.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const g = e.target.closest('.gu[data-slug]');
+    if (!g) return;
+    e.preventDefault();
+    g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
+
+  back.querySelector('.course.wide').dataset.slug = main.slug;
+  back.querySelector('.course.wide').textContent = courseLabel(main);
+  card.dataset.main = main.slug;
+  wireRegionBack(card, back, courses, li.querySelector('.rail'));
+  li.querySelector('.card-front').onclick = () => flip(card, true);
+  list.append(li);
+}
+
 async function renderRegions() {
   regionRedraw.forEach(f => {
     const i = REDRAW.indexOf(f);
@@ -928,6 +1040,8 @@ async function renderRegions() {
         name: courseLabel(main), count: n, status: st.label,
       });
     }
+    /* 목록이 1단. 카드는 순위·접기 검사용으로 그 아래에 둔다. */
+    await appendRegionCard(regions, pack, r, courses, main);
   }
 }
 
