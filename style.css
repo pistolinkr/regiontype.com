@@ -156,29 +156,28 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   width:100%;gap:12px;padding:0 0 24px;
 }
 .course-list li{display:block;position:relative}
-.course-card-item{margin-top:28px;width:230px;padding-left:62px;isolation:isolate}
 .course-list li[hidden]{display:none}
 .course-row{
   width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;
-  grid-template-rows:auto auto;column-gap:18px;row-gap:4px;
+  grid-template-rows:auto auto;column-gap:18px;row-gap:2px;
   align-items:baseline;text-align:left;
   font:inherit;color:var(--ink);cursor:pointer;
   background:transparent;border:0;border-radius:0;
-  padding:16px 20px 14px;
-  min-height:80px;
+  padding:16px 20px 12px;
+  min-height:72px;
   box-shadow:inset 3px 0 0 var(--block);
   transition:background var(--fast) var(--ease-out);
 }
 .course-row-name,
 .course-row b{
-  font-size:24px;font-weight:800;letter-spacing:-.02em;word-break:keep-all;
+  font-size:20px;font-weight:800;letter-spacing:-.02em;word-break:keep-all;
 }
 .course-row-meta{
-  font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;
+  font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;
   white-space:nowrap;justify-self:end;
 }
 .course-row-status{
-  grid-column:1;font-size:14px;font-style:normal;font-weight:600;
+  grid-column:1;font-size:12px;font-style:normal;font-weight:500;
   color:var(--ink-soft);
 }
 /* 고른 코스는 주황 면 + 플레이·진행 글자. 준비중은 글자·테두리로 가른다 */
