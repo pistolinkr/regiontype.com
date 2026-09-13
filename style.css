@@ -89,6 +89,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   background:var(--block); border:0; padding:6px 18px 8px;
   transition:background var(--fast);
 }
+#title .menu [data-go="regions"]{
+  background:var(--accent);color:#141414;
+}
 .menu a{text-decoration:none;text-align:center}
 .menu a.alt{display:none}
 :root[data-dev] .menu a.alt{display:block}
@@ -124,11 +127,25 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 /* ── 코스 목록 — 이름·개수가 1단. 점 지도는 장식(#pixelmap) ── */
 #regions .screen-head,
 #regions .course-lead,
+#regions .course-legend,
 #regions .course-stage{position:relative;z-index:2}
 .course-lead{
-  color:var(--ink-soft);font-size:14px;font-weight:500;line-height:1.45;
-  margin:-8px 0 28px;max-width:36em;word-break:keep-all;
+  color:var(--ink-soft);font-size:15px;font-weight:500;line-height:1.5;
+  margin:-8px 0 16px;max-width:38em;word-break:keep-all;
 }
+.course-legend{
+  list-style:none;display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px 16px;margin:0 0 22px;padding:0;
+  font-size:13px;font-weight:600;color:var(--ink-soft);word-break:keep-all;
+}
+.course-legend li{display:inline-flex;align-items:center;gap:6px}
+.course-legend li::before{
+  content:"";display:block;width:.7em;height:.7em;flex:0 0 auto;
+  background:var(--ink-soft);opacity:.45;
+}
+.course-legend .is-play{color:var(--accent-text);font-weight:800}
+.course-legend .is-play::before{background:var(--accent);opacity:1}
+.course-legend .is-soon::before{background:var(--block);opacity:.7}
 .course-stage{
   flex:1;display:flex;flex-direction:column;align-items:stretch;
   justify-content:flex-start;gap:12px;min-height:0;overflow:auto;
@@ -147,22 +164,27 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   font:inherit;color:var(--ink);cursor:pointer;
   background:transparent;border:0;border-radius:0;
   padding:16px 20px 14px;
-  min-height:72px;
+  min-height:80px;
+  box-shadow:inset 3px 0 0 var(--block);
   transition:background var(--fast) var(--ease-out);
 }
+.course-row-name,
 .course-row b{
-  font-size:20px;font-weight:800;letter-spacing:-.02em;word-break:keep-all;
+  font-size:24px;font-weight:800;letter-spacing:-.02em;word-break:keep-all;
 }
 .course-row-meta{
-  font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;
+  font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;
   white-space:nowrap;justify-self:end;
 }
 .course-row-status{
-  grid-column:1;font-size:12px;font-style:normal;font-weight:500;
+  grid-column:1;font-size:14px;font-style:normal;font-weight:600;
   color:var(--ink-soft);
 }
-/* 고른 코스는 주황 면 + 기본 라벨. 준비중은 글자로 가른다 */
-.course-row[data-kind="playable"]{background:var(--accent);color:#141414}
+/* 고른 코스는 주황 면 + 플레이·진행 글자. 준비중은 글자·테두리로 가른다 */
+.course-row[data-kind="playable"]{
+  background:var(--accent);color:#141414;
+  box-shadow:inset 3px 0 0 #141414;
+}
 .course-row[data-kind="playable"] .course-row-status{color:#141414}
 .course-row[data-kind="soon"]{cursor:default}
 .course-row:focus-visible{outline:3px solid var(--accent-deep);outline-offset:3px}
@@ -500,6 +522,7 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 .ov-hud .stat.time{position:relative}
 .stat.time.warn b,.stat.time.warn .ov-time{color:var(--accent-text)}
 .stat span{color:var(--ink-soft)}
+.stat.places .hud-unit{font-size:13px;font-weight:700;margin-left:4px}
 .combo{color:var(--accent-text);font-weight:800;font-size:24px;min-width:80px}
 
 .stage{flex:1;position:relative;display:flex;justify-content:center;min-height:0}
@@ -659,9 +682,10 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   z-index:-2;
   opacity:0; transition:opacity var(--slow) var(--ease-out);
 }
-/* 타이틀과 설정에서만 보인다. 나머지 화면에서는 조용히 빠진다 */
-body:has(#title.on) #pixelmap,
-body:has(#regions.on) #pixelmap{opacity:1}
+/* 타이틀에서만 또렷하다. 고르는 판에서는 장식 배경으로 내린다 */
+body:has(#title.on) #pixelmap{opacity:1}
+body:has(#regions.on) #pixelmap{opacity:.18}
+body:has(#regions.on) #pixelmap circle.hilite{fill:var(--block);opacity:.42}
 /* 모바일 안내 화면에서는 .screen 을 숨겨도 픽셀맵은 화면 밖이라 따라 숨지
    않는다. 위 display:block 보다 뒤에 와야 이긴다 — 같은 특이도라 순서가 정한다 */
 @media (pointer:coarse),(max-width:640px){ #pixelmap{display:none} }
@@ -685,6 +709,7 @@ body:has(#regions.on) #pixelmap{opacity:1}
 }
 @media (hover:hover) and (pointer:fine){
   .menu button:hover, .menu a:hover, #save:hover, #again:hover{background:var(--accent)}
+  #title .menu [data-go="regions"]:hover{background:var(--accent-deep);color:#141414}
   .step:hover{color:var(--accent)}
   .toggle:hover{border-color:var(--accent)}
 }

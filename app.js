@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = s => document.querySelector(s);
-const VER = '0.98';
+const VER = '0.99';
 const asset = p => p + (p.includes('?') ? '&' : '?') + 'v=' + VER;
 /* 설정 화면의 빌드 번호는 VER 에서 직접 읽는다. 손으로 적어두면 올릴 때마다
    맞춰야 할 자리가 하나 더 늘고, 언젠가 실제 빌드와 어긋난다. */
@@ -163,6 +163,10 @@ function beep(freq, dur = .07, type = 'sine') {
 
 /* ── 화면 ───────────────────────────────────────────── */
 function go(id) {
+  const leavingPlay = $('#play').classList.contains('on') && id !== 'play';
+  /* 타이틀 근접장이 고르는 판으로 넘어가도 점·색이 남는다. 타이틀을 떠나면 비운다. */
+  if (id !== 'title') clearPixelHover();
+  if (leavingPlay) snapshotPlay();
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   if (id !== 'play') stop();
   requestAnimationFrame(() => requestAnimationFrame(syncGrid));
@@ -283,6 +287,13 @@ function expandPixelRow(row) {
   return out;
 }
 let pmDraw = null, pmBits = [];
+function clearPixelHover() {
+  pmBits.forEach(b => {
+    b.el.style.transform = '';
+    b.el.style.fill = '';
+    b.el.style.opacity = '';
+  });
+}
 function loadPixels(file) {
   return grab(file.endsWith('.json') ? file : `data/${file}.json`).then(g => {
     const rows = g.enc === 'rle' ? g.rows.map(expandPixelRow) : g.rows;
@@ -322,7 +333,7 @@ function loadPixels(file) {
   const paint = () => {
     raf = 0;
     if (!fine() || !pmBits.length) return;
-    if (!$('#title.on')) { pmBits.forEach(clearBit); return; }
+    if (!$('#title.on')) { clearPixelHover(); return; }
     const ctm = svg.getScreenCTM();
     if (!ctm) return;
     const pt = svg.createSVGPoint();
@@ -786,8 +797,67 @@ function courseBest(slug) {
   } catch {}
   return best;
 }
+/* 한 판의 점령 기록. finish·중도 퇴장에서 남긴다. 최고점만 있는 옛 판은 leftover 로 읽는다. */
+function coursePlay(slug) {
+  try {
+    const raw = localStorage.getItem('rt.play.' + slug);
+    if (!raw) return null;
+    const rec = JSON.parse(raw);
+    return rec && typeof rec === 'object' ? rec : null;
+  } catch { return null; }
+}
+function recordPlay(slug, hits, total, score) {
+  try {
+    const k = 'rt.play.' + slug;
+    let prev = {};
+    try { prev = JSON.parse(localStorage.getItem(k) || 'null') || {}; } catch { prev = {}; }
+    const complete = !!(prev.complete) || (hits === total && total > 0);
+    localStorage.setItem(k, JSON.stringify({
+      attempts: (prev.attempts || 0) + 1,
+      lastHits: hits,
+      lastTotal: total,
+      lastScore: score,
+      lastAt: Date.now(),
+      bestHits: Math.max(prev.bestHits || 0, hits),
+      complete,
+    }));
+    if (complete) localStorage.setItem('rt.done.' + slug, String(Date.now()));
+  } catch {}
+}
+function snapshotPlay() {
+  if (!G || !G.slug || G.logged) return;
+  /* 카운트다운만 보고 나가면 기록이 아니다. finish() 는 G.finishing 으로 통과한다. */
+  if (!G.finishing && !tick && !(G.hits > 0)) return;
+  G.logged = true;
+  recordPlay(G.slug, G.hits, G.items.length, G.score);
+}
+function courseProgress(slug) {
+  const rec = coursePlay(slug);
+  if (rec && rec.complete) return 'done';
+  if (rec || courseBest(slug) > 0) return 'leftover';
+  return 'idle';
+}
+function playableStatusLabel(slug, total) {
+  const rec = coursePlay(slug);
+  const best = courseBest(slug);
+  const kind = courseProgress(slug);
+  const bits = [t('statusPlay')];
+  if (kind === 'idle') bits.push(t('statusIdle'));
+  else if (kind === 'done') {
+    bits.push(t('statusDone'));
+    if (best) bits.push(t('statusBest', { n: best }));
+  } else if (rec) {
+    bits.push(t('statusLeftoverHits', { n: rec.lastHits, total: rec.lastTotal || total }));
+  } else {
+    bits.push(t('statusLeftover'));
+  }
+  return { kind, label: bits.join(' · ') };
+}
 function courseStatus(slug) {
   const n = courseBest(slug);
+  const kind = courseProgress(slug);
+  if (kind === 'done') return { kind, label: t('statusDone') };
+  if (kind === 'leftover') return { kind, label: t('statusLeftover') };
   if (n > 0) return { kind: 'played', label: t('statusBest', { n }) };
   return { kind: 'idle', label: t('statusIdle') };
 }
@@ -800,8 +870,10 @@ function appendCourseRow(list, spec) {
   else row.setAttribute('aria-disabled', 'true');
   row.className = 'course-row';
   row.dataset.kind = spec.kind;
+  if (spec.progress) row.dataset.progress = spec.progress;
   if (spec.slug) row.dataset.slug = spec.slug;
   const name = document.createElement('b');
+  name.className = 'course-row-name';
   name.textContent = spec.name;
   const meta = document.createElement('span');
   meta.className = 'course-row-meta';
@@ -835,11 +907,12 @@ async function renderRegions() {
     const n = (main.items || []).length;
     if (r.nested) {
       if (lead && !lead.textContent) lead.textContent = t('pickerLeadPlayable');
+      const st = playableStatusLabel(main.slug, n);
       appendCourseRow(regions, {
-        kind: 'playable', slug: main.slug,
-        name: t('courseSeoulGu'), count: n, status: t('statusDefault'),
+        kind: 'playable', slug: main.slug, progress: st.kind,
+        name: t('courseSeoulGu'), count: n, status: st.label,
       });
-      /* 한강 이남 11 · 이북 14 — 25 자치구를 가르는 자리. 아직 코스가 없다. */
+      /* 한강 이남 11 · 이북 14 — 플레이 가능 25를 가르는 자리. 아직 코스가 없다. */
       appendCourseRow(regions, {
         kind: 'soon', name: t('courseHangangSouth'), count: 11, status: t('statusSoon'),
       });
@@ -848,9 +921,10 @@ async function renderRegions() {
       });
     } else {
       if (lead && !lead.textContent) lead.textContent = t('pickerLeadSingle', { n });
+      const st = playableStatusLabel(main.slug, n);
       appendCourseRow(regions, {
-        kind: 'playable', slug: main.slug,
-        name: courseLabel(main), count: n, status: t('statusDefault'),
+        kind: 'playable', slug: main.slug, progress: st.kind,
+        name: courseLabel(main), count: n, status: st.label,
       });
     }
   }
@@ -920,6 +994,9 @@ function resolveCountry() {
 
 function resolveLang() {
   if (opt.lang !== 'auto' && UI_LANGS.includes(opt.lang)) return opt.lang;
+  /* 배포 기본은 한국어. 영문 브라우저로 열어도 크롬과 코스 이름이 섞이지 않게
+     나라(KR)를 브라우저 언어보다 앞세운다. 다른 언어는 설정에서 고른다. */
+  if (COUNTRY === 'KR' && UI_LANGS.includes('ko')) return 'ko';
   for (const tag of [HERE.lang, ...(navigator.languages || []), navigator.language]) {
     const hit = parseUiLang(tag);
     if (hit) return hit;
@@ -1150,7 +1227,8 @@ async function start(slug) {
   });
   G = { slug, course, items, zoom, seq: course.mode === 'sequence', idx: 0,
        total: opt.time, left: opt.time, hits: 0, tries: 0, combo: 0, best: 0, score: 0,
-       cell: geom.cell, spacy: items.some(it => /\s/.test(it.name)) };
+       cell: geom.cell, spacy: items.some(it => /\s/.test(it.name)),
+       logged: false, finishing: false };
   $('#typein').lang = course.lang || document.documentElement.lang;
 
   const svg = $('#map');
@@ -1530,6 +1608,9 @@ function claim(it) {
 }
 
 function finish() {
+  if (!G || G.finishing) return;
+  G.finishing = true;
+  snapshotPlay();
   stop();
   beep(300, .3, 'triangle');
   G.items.filter(i => !i.claimed).forEach(i => i.el.classList.add('miss'));
@@ -1908,9 +1989,15 @@ if (location.search.includes('rt=1')) {
   console.assert(parseUiLang('zh-Hant-TW') === 'zh', '번체 UI 는 zh 로');
   console.assert(parseUiLang('de-AT') === 'de', 'de-AT → de UI');
   opt.lang = 'auto'; LANG = resolveLang();
+  const countryWas = COUNTRY;
+  COUNTRY = 'KR';
+  opt.lang = 'auto';
+  HERE = { country: 'KR', lang: 'en-US', timezone: 'America/New_York' };
+  console.assert(resolveLang() === 'ko', 'KR 기본은 한국어');
   HERE = { country: 'BR', lang: 'pt-BR', timezone: 'America/Sao_Paulo' };
   COUNTRY = 'BR';
   console.assert(resolveLang() === 'pt', 'pt-BR → pt UI');
+  COUNTRY = countryWas;
 
   WORLD = { countries: [
     { id: 'KR', regions: [{ id: 'seoul', title: { ko: '서울' } }] },
@@ -1929,6 +2016,22 @@ if (location.search.includes('rt=1')) {
   console.assert(courseBest('__rt_missing') === 0, '없는 코스는 0');
   if (bestPrev == null) localStorage.removeItem(bestKey);
   else localStorage.setItem(bestKey, bestPrev);
+
+  const playKey = 'rt.play.__rt_prog';
+  const doneKey = 'rt.done.__rt_prog';
+  const playPrev = localStorage.getItem(playKey);
+  const donePrev = localStorage.getItem(doneKey);
+  localStorage.removeItem(playKey);
+  localStorage.removeItem(doneKey);
+  console.assert(courseProgress('__rt_prog') === 'idle', '안 함');
+  recordPlay('__rt_prog', 3, 25, 300);
+  console.assert(courseProgress('__rt_prog') === 'leftover', '남음');
+  recordPlay('__rt_prog', 25, 25, 2000);
+  console.assert(courseProgress('__rt_prog') === 'done', '완료');
+  if (playPrev == null) localStorage.removeItem(playKey);
+  else localStorage.setItem(playKey, playPrev);
+  if (donePrev == null) localStorage.removeItem(doneKey);
+  else localStorage.setItem(doneKey, donePrev);
 
   console.log('self-check done');
 }
