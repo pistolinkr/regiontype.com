@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = s => document.querySelector(s);
-const VER = '0.96';
+const VER = '1.01';
 const asset = p => p + (p.includes('?') ? '&' : '?') + 'v=' + VER;
 /* 설정 화면의 빌드 번호는 VER 에서 직접 읽는다. 손으로 적어두면 올릴 때마다
    맞춰야 할 자리가 하나 더 늘고, 언젠가 실제 빌드와 어긋난다. */
@@ -163,11 +163,17 @@ function beep(freq, dur = .07, type = 'sine') {
 
 /* ── 화면 ───────────────────────────────────────────── */
 function go(id) {
+  const leavingPlay = $('#play').classList.contains('on') && id !== 'play';
+  /* 타이틀 근접장이 고르는 판으로 넘어가도 점·색이 남는다. 타이틀을 떠나면 비운다. */
+  if (id !== 'title') clearPixelHover();
+  if (leavingPlay) snapshotPlay();
+  document.documentElement.dataset.screen = id;
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   if (id !== 'play') stop();
   requestAnimationFrame(() => requestAnimationFrame(syncGrid));
   // 숨은 화면에서는 높이가 0으로 읽힌다. 보이게 된 뒤에 재어 둔다
   requestAnimationFrame(() => document.querySelectorAll('.course-list .card').forEach(measureCard));
+  if (id === 'regions') renderRegions();
 }
 
 function applyGrid(ox, oy, n) {
@@ -258,9 +264,10 @@ document.addEventListener('click', e => {
   const drum = document.querySelector('.wheel[data-on]');
   if (drum && !drum.closest('.stat.time').contains(e.target)) closeWheel(drum);
   const open = document.querySelector('.card[data-flip="true"]');
-  /* 카드탭은 카드의 형제라 카드 안에 없다. 탭을 누른 것도 카드 안을 누른 것이다 —
-     이걸 빼먹으면 탭을 누를 때마다 '바깥을 눌렀다'로 읽혀 카드가 닫힌다. */
-  if (open && !open.contains(e.target) && !open.parentElement.contains(e.target))
+  /* 접기는 카드·레일 밖이다. li 전체로 보면 지도 .hit 가 카드 밖으로
+     새어 나와도 '안'으로 읽혀 접히지 않는다. */
+  const rail = open && open.parentElement && open.parentElement.querySelector(':scope > .rail');
+  if (open && !open.contains(e.target) && !(rail && rail.contains(e.target)))
     flip(open, false);
   const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go);
   const tog = e.target.closest('.toggle');
@@ -282,6 +289,13 @@ function expandPixelRow(row) {
   return out;
 }
 let pmDraw = null, pmBits = [];
+function clearPixelHover() {
+  pmBits.forEach(b => {
+    b.el.style.transform = '';
+    b.el.style.fill = '';
+    b.el.style.opacity = '';
+  });
+}
 function loadPixels(file) {
   return grab(file.endsWith('.json') ? file : `data/${file}.json`).then(g => {
     const rows = g.enc === 'rle' ? g.rows.map(expandPixelRow) : g.rows;
@@ -321,7 +335,7 @@ function loadPixels(file) {
   const paint = () => {
     raf = 0;
     if (!fine() || !pmBits.length) return;
-    if (!$('#title.on')) { pmBits.forEach(clearBit); return; }
+    if (!$('#title.on')) { clearPixelHover(); return; }
     const ctm = svg.getScreenCTM();
     if (!ctm) return;
     const pt = svg.createSVGPoint();
@@ -465,10 +479,12 @@ function flip(card, open) {
   if (!open) {
     const wasPreview = card.dataset.preview === '1';
     card.removeAttribute('data-preview');
+    card.removeAttribute('data-rank');
     lockUntilSettled(card, wasPreview ? card._resetPick : null);
     card.querySelector('.card-front').focus();
     return;
   }
+  if (card._markRail) card._markRail(false);
   const play = card.querySelector('.ov-play');
   const focus = (play && !play.hidden && card.querySelector('.ov-start'))
     || card.querySelector('.ov-start');
@@ -626,6 +642,17 @@ function wireRegionBack(card, back, courses, rail) {
    결과 화면의 순위표는 판이 끝나야 보인다. 여기선 치기 전에 남들이 어디쯤
    몰려 있는지를 먼저 본다 — 겨룰 상대가 보여야 겨룰 마음이 든다.
    판은 (코스, 제한 시간) 이라 화살표로 코스를 넘기고 시간은 설정을 따른다. */
+function rankStatusCopy(dist, joined) {
+  if (dist.score !== null)
+    return t('rankYou', {
+      pct: Math.max(1, Math.round((dist.over + 1) / dist.total * 100)),
+      total: dist.total, rank: dist.over + 1,
+    });
+  if (!joined) return t('rankNeedName');
+  if (dist.total) return t('rankOthers', { n: dist.total });
+  return t('rankEmpty');
+}
+
 function wireRank(card, back, courses, showPick, rail) {
   const pane = back.querySelector('.ov-rank');
   const pick = back.querySelector('.ov-pick');
@@ -671,26 +698,22 @@ function wireRank(card, back, courses, showPick, rail) {
     if (!FEEDBACK_URL) return say(t('noBoard'), true);
     try {
       const play = { c: c.slug, t: opt.time };
-      const [d, t] = await Promise.all([
+      const [dist, top] = await Promise.all([
         boardAsk('/dist', { ...play }),
         boardAsk(`/top?c=${encodeURIComponent(play.c)}&t=${play.t}`),
       ]);
       if (n !== gen) return;
-      plot(d);
-      drawRanks(t.top || [], list);
+      plot(dist);
+      drawRanks(top.top || [], list);
       /* 등수는 서버가 센 값으로만 적는다. 막대에서 눈대중한 자리를 숫자로 적으면
          보이는 것과 실제가 어긋난다. */
       /* 판이 빈 것과 내가 안 올린 것은 다른 말이다. 이름을 안 적었으면 그 말을
          해줘야 한다 — 안 그러면 한 판 치고 와서 "아직 아무도" 를 보고
-         순위표가 고장났다고 읽는다. */
+         순위표가 고장났다고 읽는다.
+         응답 이름을 t 로 받으면 i18n t() 를 가려 빈 판 문구가 깨진다. */
       const joined = !!localStorage.getItem(NAME_KEY);
-      pane.querySelector('.rank-you').textContent = d.score !== null
-        ? t('rankYou', { pct: Math.max(1, Math.round((d.over + 1) / d.total * 100)),
-                         total: d.total, rank: d.over + 1 })
-        : !joined ? t('rankNeedName')
-        : d.total ? t('rankOthers', { n: d.total })
-        : t('rankEmpty');
-      if (d.score !== null) pane.querySelector('.rank-score').textContent = d.score + t('scoreUnit');
+      pane.querySelector('.rank-you').textContent = rankStatusCopy(dist, joined);
+      if (dist.score !== null) pane.querySelector('.rank-score').textContent = dist.score + t('scoreUnit');
       say('');
     } catch { if (n === gen) say(t('rankFail'), true); }
   }
@@ -703,8 +726,11 @@ function wireRank(card, back, courses, showPick, rail) {
     [{ transform: `rotateY(${from}deg)` }, { transform: `rotateY(${to}deg)` }],
     { duration: ms, easing: 'cubic-bezier(.77,0,.175,1)', fill: 'both' });
 
-  const mark = on => rail.querySelectorAll('.rail-b').forEach(b =>
-    b.setAttribute('aria-selected', (b.dataset.pane === 'rank') === on));
+  const mark = on => rail.querySelectorAll('.rail-b').forEach(b => {
+    const sel = on ? b.dataset.pane === 'rank' : b.dataset.pane === 'pick';
+    b.setAttribute('aria-selected', String(sel));
+  });
+  card._markRail = mark;
 
   let turning = false;
   const open = async on => {
@@ -751,16 +777,28 @@ function wireRank(card, back, courses, showPick, rail) {
   };
 }
 
+function dismissCard(card) {
+  const drum = card.querySelector('.wheel[data-on]');
+  if (drum) closeWheel(drum);
+  card.removeAttribute('data-preview');
+  card.removeAttribute('data-rank');
+  if (card._resetPick) card._resetPick();
+  const pane = card.querySelector('.ov-rank');
+  const pick = card.querySelector('.ov-pick');
+  if (pane) pane.hidden = true;
+  if (pick) pick.hidden = false;
+  if (card._markRail) card._markRail(false);
+  if (card.dataset.flip === 'true') flip(card, false);
+}
+
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const drum = document.querySelector('.wheel[data-on]');
   if (drum) { closeWheel(drum); return; }
   const open = document.querySelector('.card[data-flip="true"]');
   if (!open) return;
-  if (open._closeRank && open._closeRank()) return;
-  const play = open.querySelector('.ov-play');
-  if (play && !play.hidden && open._showPick) { open._showPick(); return; }
-  flip(open, false);
+  e.preventDefault();
+  dismissCard(open);
 });
 
 /* ── 코스 로드 ──────────────────────────────────────── */
@@ -771,6 +809,108 @@ const load = slug => Promise.all([loadCourse(slug), loadGeom(slug)]);
 
 let regionRedraw = [];
 
+/* 코스 최고점은 rt.best.{slug}.z{배율}. 배율은 지금 3뿐이라 접두만 훑는다. */
+function courseBest(slug) {
+  let best = 0;
+  try {
+    const prefix = `rt.best.${slug}.`;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !k.startsWith(prefix)) continue;
+      const n = Number(localStorage.getItem(k) || 0);
+      if (n > best) best = n;
+    }
+  } catch {}
+  return best;
+}
+/* 한 판의 점령 기록. finish·중도 퇴장에서 남긴다. 최고점만 있는 옛 판은 leftover 로 읽는다. */
+function coursePlay(slug) {
+  try {
+    const raw = localStorage.getItem('rt.play.' + slug);
+    if (!raw) return null;
+    const rec = JSON.parse(raw);
+    return rec && typeof rec === 'object' ? rec : null;
+  } catch { return null; }
+}
+function recordPlay(slug, hits, total, score) {
+  try {
+    const k = 'rt.play.' + slug;
+    let prev = {};
+    try { prev = JSON.parse(localStorage.getItem(k) || 'null') || {}; } catch { prev = {}; }
+    const complete = !!(prev.complete) || (hits === total && total > 0);
+    localStorage.setItem(k, JSON.stringify({
+      attempts: (prev.attempts || 0) + 1,
+      lastHits: hits,
+      lastTotal: total,
+      lastScore: score,
+      lastAt: Date.now(),
+      bestHits: Math.max(prev.bestHits || 0, hits),
+      complete,
+    }));
+    if (complete) localStorage.setItem('rt.done.' + slug, String(Date.now()));
+  } catch {}
+}
+function snapshotPlay() {
+  if (!G || !G.slug || G.logged) return;
+  /* 카운트다운만 보고 나가면 기록이 아니다. finish() 는 G.finishing 으로 통과한다. */
+  if (!G.finishing && !tick && !(G.hits > 0)) return;
+  G.logged = true;
+  recordPlay(G.slug, G.hits, G.items.length, G.score);
+}
+function courseProgress(slug) {
+  const rec = coursePlay(slug);
+  if (rec && rec.complete) return 'done';
+  if (rec || courseBest(slug) > 0) return 'leftover';
+  return 'idle';
+}
+function playableStatusLabel(slug, total) {
+  /* 고른 줄이 곧 시작. 장식 라벨은 Figma 의 '기본' 이고, 친 적 있으면 남음·완료만 덧붙인다. */
+  const rec = coursePlay(slug);
+  const best = courseBest(slug);
+  const kind = courseProgress(slug);
+  if (kind === 'idle') return { kind, label: t('statusDefault') };
+  if (kind === 'done') {
+    const bits = [t('statusDone')];
+    if (best) bits.push(t('statusBest', { n: best }));
+    return { kind, label: bits.join(' · ') };
+  }
+  if (rec) return { kind, label: t('statusLeftoverHits', { n: rec.lastHits, total: rec.lastTotal || total }) };
+  return { kind, label: t('statusLeftover') };
+}
+function courseStatus(slug) {
+  const n = courseBest(slug);
+  const kind = courseProgress(slug);
+  if (kind === 'done') return { kind, label: t('statusDone') };
+  if (kind === 'leftover') return { kind, label: t('statusLeftover') };
+  if (n > 0) return { kind: 'played', label: t('statusBest', { n }) };
+  return { kind: 'idle', label: t('statusIdle') };
+}
+
+function appendCourseRow(list, spec) {
+  const li = document.createElement('li');
+  const playable = spec.kind === 'playable';
+  const row = document.createElement(playable ? 'button' : 'div');
+  if (playable) row.type = 'button';
+  else row.setAttribute('aria-disabled', 'true');
+  row.className = 'course-row';
+  row.dataset.kind = spec.kind;
+  if (spec.progress) row.dataset.progress = spec.progress;
+  if (spec.slug) row.dataset.slug = spec.slug;
+  const name = document.createElement('b');
+  name.className = 'course-row-name';
+  name.textContent = spec.name;
+  const meta = document.createElement('span');
+  meta.className = 'course-row-meta';
+  meta.textContent = t('countN', { n: spec.count });
+  const status = document.createElement('em');
+  status.className = 'course-row-status';
+  status.textContent = spec.status;
+  row.append(name, meta, status);
+  if (playable && spec.slug) row.addEventListener('click', () => start(spec.slug));
+  li.append(row);
+  list.append(li);
+}
+
 async function renderRegions() {
   regionRedraw.forEach(f => {
     const i = REDRAW.indexOf(f);
@@ -778,107 +918,39 @@ async function renderRegions() {
   });
   regionRedraw = [];
   const regions = $('#regionList');
+  const lead = $('#courseLead');
   regions.replaceChildren();
+  if (lead) lead.textContent = '';
   const pack = WORLD.countries.find(c => c.id === COUNTRY) || WORLD.countries[0];
   if (!pack) return;
   for (const r of pack.regions) {
-    /* 코스를 줄줄이 기다리면 지역 화면이 그만큼 늦게 뜬다. 한꺼번에 받는다. */
-    const [geom, courses] = await Promise.all([
-      loadGeom(r.thumb),
-      Promise.all(r.courses.map(loadCourse))
-    ]);
-
-    const li = document.createElement('li');
-    /* 카드탭은 카드 *밖*이다. 안에 두면 카드가 제 안쪽을 잘라내(overflow:hidden)
-       밖으로 못 나가고, 카드 안에 넣으면 카드와 함께 돌아 좌우가 뒤집힌다.
-       카드 뒤에 적어 형제 선택자(.card ~ .rail)로 열린 상태를 읽는다. */
-    li.innerHTML = `<div class="card" data-flip="false">
-        <button type="button" class="card-face card-front" aria-expanded="false">
-          <span class="card-top"><span class="thumb"></span></span>
-          <span class="card-body"><b></b><em></em><span class="desc"></span></span>
-        </button>
-      </div>
-      <div class="rail" role="tablist" aria-label="${t('cardView')}">
-        <button type="button" class="rail-b" data-pane="pick" role="tab" aria-selected="true">
-          <i class="i i-pin" aria-hidden="true"></i><span class="sr">${t('pickCourse')}</span>
-        </button>
-        <button type="button" class="rail-b" data-pane="rank" role="tab" aria-selected="false">
-          <i class="i i-chart" aria-hidden="true"></i><span class="sr">${t('rankTab')}</span>
-        </button>
-      </div>`;
-    const thumb = li.querySelector('.thumb');
-    const drawThumb = () => thumb.innerHTML = thumbSvg(geom);
-    REDRAW.push(drawThumb); regionRedraw.push(drawThumb); drawThumb();
-    const title = loc(r.title) || countryName(pack.id);
-    li.querySelector('.card-body b').textContent = title;
-    li.querySelector('.card-body em').textContent = t('nCourses', { n: r.courses.length });
-    li.querySelector('.desc').textContent = loc(r.description) || t('places', { n: courses[0]?.items.length || 0 });
-
-    const card = li.querySelector('.card');
-    const back = $('#regionTpl').content.firstElementChild.cloneNode(true);
-    back.classList.add('card-face');
-    card.append(back);
-    back.inert = true;
-
-    /* 카드를 돌리면 뒷면이 서울 비트맵이다. 목록에서 구 이름을 찾는 것보다
-       지도에서 짚는 게 빠르고, 어디인지가 곧 무엇인지다. */
-    const bySlug = new Map(courses.map(c => [c.slug, c]));
-    const byGu = new Map();
-    courses.forEach(c => {
-      const m = /^(\S+구)\s/.exec(c.title);
-      if (m && c.slug.endsWith('-dong')) byGu.set(m[1], c.slug);
-    });
-
-    const pane = back.querySelector('.pickmap');
-    const drawPick = () => {
-      pane.innerHTML = pickMapSvg(geom);
-      pane.querySelectorAll('.gu').forEach(g => {
-        const slug = r.nested && byGu.get(g.dataset.gu);
-        if (slug) g.dataset.slug = slug;
-        else if (r.nested) {
-          g.classList.add('off'); g.removeAttribute('tabindex'); g.removeAttribute('role');
-        }
+    /* 고르는 판은 이름·개수 목록이다. 점 지도는 #pixelmap 장식만 쓴다. */
+    const courses = await Promise.all(r.courses.map(loadCourse));
+    const main = courses.find(c => c.slug === r.main) || courses[0];
+    if (!main) continue;
+    const n = (main.items || []).length;
+    if (r.nested) {
+      if (lead && !lead.textContent) lead.textContent = t('pickerLeadPlayable');
+      const st = playableStatusLabel(main.slug, n);
+      appendCourseRow(regions, {
+        kind: 'playable', slug: main.slug, progress: st.kind,
+        name: t('courseSeoulGu'), count: n, status: st.label,
       });
-    };
-    REDRAW.push(drawPick); regionRedraw.push(drawPick); drawPick();
-
-    /* 이름 25개를 지도에 다 얹으면 서로 밟는다. 짚는 곳만 아래 한 줄로 읽는다. */
-    const name = back.querySelector('.pickname');
-    const idle = r.nested ? t('idleNested') : t('idleAdmin');
-    name.dataset.idle = idle;
-    name.textContent = idle;
-    const tell = g => {
-      if (!g) { name.textContent = idle; return; }
-      const c = g.dataset.slug && bySlug.get(g.dataset.slug);
-      if (c) name.textContent = `${c.title} · ${t('places', { n: c.items.length })}`;
-      else if (g.dataset.gu) name.textContent = g.dataset.gu;
-      else name.textContent = idle;
-    };
-    pane.addEventListener('pointerover', e => tell(e.target.closest('.gu')));
-    pane.addEventListener('pointerout', () => tell(null));
-    /* SVG 묶음은 초점을 받아도 focus 이벤트를 아예 안 쏜다(활성 요소만 바뀐다).
-       Tab 은 키를 뗄 때 새 초점 위에서 keyup 이 나므로 그걸로 읽는다. */
-    pane.addEventListener('keyup', e => {
-      const g = e.target.closest && e.target.closest('.gu');
-      if (g) tell(g);
-    });
-    /* SVG 묶음은 버튼이 아니라 Enter·Space 가 저절로 눌리지 않는다 */
-    pane.addEventListener('keydown', e => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      const g = e.target.closest('.gu[data-slug]');
-      if (!g) return;
-      e.preventDefault();
-      g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    const main = bySlug.get(r.main) || courses[0];
-    back.querySelector('.course.wide').dataset.slug = main.slug;
-    back.querySelector('.course.wide').textContent = courseLabel(main);
-
-    card.dataset.main = main.slug;
-    wireRegionBack(card, back, courses, li.querySelector('.rail'));
-    li.querySelector('.card-front').onclick = () => flip(card, true);
-    regions.append(li);
+      /* 한강 이남 11 · 이북 14 — 플레이 가능 25를 가르는 자리. 아직 코스가 없다. */
+      appendCourseRow(regions, {
+        kind: 'soon', name: t('courseHangangSouth'), count: 11, status: t('statusSoon'),
+      });
+      appendCourseRow(regions, {
+        kind: 'soon', name: t('courseHangangNorth'), count: 14, status: t('statusSoon'),
+      });
+    } else {
+      if (lead && !lead.textContent) lead.textContent = t('pickerLeadSingle', { n });
+      const st = playableStatusLabel(main.slug, n);
+      appendCourseRow(regions, {
+        kind: 'playable', slug: main.slug, progress: st.kind,
+        name: courseLabel(main), count: n, status: st.label,
+      });
+    }
   }
 }
 
@@ -946,6 +1018,9 @@ function resolveCountry() {
 
 function resolveLang() {
   if (opt.lang !== 'auto' && UI_LANGS.includes(opt.lang)) return opt.lang;
+  /* 배포 기본은 한국어. 영문 브라우저로 열어도 크롬과 코스 이름이 섞이지 않게
+     나라(KR)를 브라우저 언어보다 앞세운다. 다른 언어는 설정에서 고른다. */
+  if (COUNTRY === 'KR' && UI_LANGS.includes('ko')) return 'ko';
   for (const tag of [HERE.lang, ...(navigator.languages || []), navigator.language]) {
     const hit = parseUiLang(tag);
     if (hit) return hit;
@@ -1176,7 +1251,8 @@ async function start(slug) {
   });
   G = { slug, course, items, zoom, seq: course.mode === 'sequence', idx: 0,
        total: opt.time, left: opt.time, hits: 0, tries: 0, combo: 0, best: 0, score: 0,
-       cell: geom.cell, spacy: items.some(it => /\s/.test(it.name)) };
+       cell: geom.cell, spacy: items.some(it => /\s/.test(it.name)),
+       logged: false, finishing: false };
   $('#typein').lang = course.lang || document.documentElement.lang;
 
   const svg = $('#map');
@@ -1556,6 +1632,9 @@ function claim(it) {
 }
 
 function finish() {
+  if (!G || G.finishing) return;
+  G.finishing = true;
+  snapshotPlay();
   stop();
   beep(300, .3, 'triangle');
   G.items.filter(i => !i.claimed).forEach(i => i.el.classList.add('miss'));
@@ -1934,9 +2013,15 @@ if (location.search.includes('rt=1')) {
   console.assert(parseUiLang('zh-Hant-TW') === 'zh', '번체 UI 는 zh 로');
   console.assert(parseUiLang('de-AT') === 'de', 'de-AT → de UI');
   opt.lang = 'auto'; LANG = resolveLang();
+  const countryWas = COUNTRY;
+  COUNTRY = 'KR';
+  opt.lang = 'auto';
+  HERE = { country: 'KR', lang: 'en-US', timezone: 'America/New_York' };
+  console.assert(resolveLang() === 'ko', 'KR 기본은 한국어');
   HERE = { country: 'BR', lang: 'pt-BR', timezone: 'America/Sao_Paulo' };
   COUNTRY = 'BR';
   console.assert(resolveLang() === 'pt', 'pt-BR → pt UI');
+  COUNTRY = countryWas;
 
   WORLD = { countries: [
     { id: 'KR', regions: [{ id: 'seoul', title: { ko: '서울' } }] },
@@ -1947,6 +2032,30 @@ if (location.search.includes('rt=1')) {
   console.assert(countryStage('JP') === 'preview', 'admin-1 뿐이면 미리보기');
   console.assert(countryStage('XX') === 'preview', '모르는 나라도 미리보기로 떨어진다');
   console.assert(countryStage('ZZ') === 'preview', 'regions 가 없어도 터지지 않는다');
+
+  const bestKey = 'rt.best.__rt_test.z3';
+  const bestPrev = localStorage.getItem(bestKey);
+  localStorage.setItem(bestKey, '1200');
+  console.assert(courseBest('__rt_test') === 1200, '로컬 최고점');
+  console.assert(courseBest('__rt_missing') === 0, '없는 코스는 0');
+  if (bestPrev == null) localStorage.removeItem(bestKey);
+  else localStorage.setItem(bestKey, bestPrev);
+
+  const playKey = 'rt.play.__rt_prog';
+  const doneKey = 'rt.done.__rt_prog';
+  const playPrev = localStorage.getItem(playKey);
+  const donePrev = localStorage.getItem(doneKey);
+  localStorage.removeItem(playKey);
+  localStorage.removeItem(doneKey);
+  console.assert(courseProgress('__rt_prog') === 'idle', '안 함');
+  recordPlay('__rt_prog', 3, 25, 300);
+  console.assert(courseProgress('__rt_prog') === 'leftover', '남음');
+  recordPlay('__rt_prog', 25, 25, 2000);
+  console.assert(courseProgress('__rt_prog') === 'done', '완료');
+  if (playPrev == null) localStorage.removeItem(playKey);
+  else localStorage.setItem(playKey, playPrev);
+  if (donePrev == null) localStorage.removeItem(doneKey);
+  else localStorage.setItem(doneKey, donePrev);
 
   console.log('self-check done');
 }

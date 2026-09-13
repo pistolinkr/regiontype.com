@@ -89,6 +89,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   background:var(--block); border:0; padding:6px 18px 8px;
   transition:background var(--fast);
 }
+#title .menu [data-go="regions"]{
+  background:var(--accent);color:#141414;
+}
 .menu a{text-decoration:none;text-align:center}
 .menu a.alt{display:none}
 :root[data-dev] .menu a.alt{display:block}
@@ -121,24 +124,82 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 }
 .back .i{font-size:34px}
 
-/* ── 코스 목록 — 레퍼런스: 색 블록 상단 + 크림 본문, 아래 중앙에 공용 Play ── */
+/* ── 코스 목록 — 이름·개수가 1단. 점 지도는 장식(#pixelmap) ── */
+#regions .screen-head,
+#regions .course-lead,
+#regions .course-legend,
+#regions .course-stage{position:relative;z-index:2}
+.course-lead{
+  color:var(--ink-soft);font-size:15px;font-weight:500;line-height:1.5;
+  margin:-8px 0 16px;max-width:38em;word-break:keep-all;
+}
+.course-legend{
+  list-style:none;display:flex;flex-wrap:wrap;align-items:center;
+  gap:8px 16px;margin:0 0 22px;padding:0;
+  font-size:13px;font-weight:600;color:var(--ink-soft);word-break:keep-all;
+}
+.course-legend li{display:inline-flex;align-items:center;gap:6px}
+.course-legend li::before{
+  content:"";display:block;width:.7em;height:.7em;flex:0 0 auto;
+  background:var(--ink-soft);opacity:.45;
+}
+.course-legend .is-play{color:var(--accent-text);font-weight:800}
+.course-legend .is-play::before{background:var(--accent);opacity:1}
+.course-legend .is-soon::before{background:var(--block);opacity:.7}
 .course-stage{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:40px;
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;
+  justify-content:flex-start;gap:12px;
+  width:min(560px,100%);
 }
-/* 목록은 무대 폭을 다 쓴다. 내용에 맞춰 줄어들게 두면 그 폭이 닫힌 카드(230px)로
-   굳어서, 뒤집힌 카드가 고르는 판 크기로 자라지 못하고 도로 눌린다. */
 .course-list{
-  list-style:none;display:flex;align-items:center;justify-content:center;
-  width:100%;gap:26px;padding:0;perspective:1400px;
+  list-style:none;display:flex;flex-direction:column;align-items:stretch;
+  width:100%;gap:12px;padding:0 0 24px;
 }
-.course-list li{flex:0 0 auto}
-.course-list li{display:flex;position:relative}
+.course-list li{display:block;position:relative}
 .course-list li[hidden]{display:none}
+.course-row{
+  width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-rows:auto auto;column-gap:18px;row-gap:2px;
+  align-items:baseline;text-align:left;
+  font:inherit;color:var(--ink);cursor:pointer;
+  background:transparent;border:0;border-radius:0;
+  padding:16px 20px 12px;
+  min-height:72px;
+  box-shadow:inset 3px 0 0 var(--block);
+  transition:background var(--fast) var(--ease-out);
+}
+.course-row-name,
+.course-row b{
+  font-size:20px;font-weight:800;letter-spacing:-.02em;word-break:keep-all;
+}
+.course-row-meta{
+  font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;
+  white-space:nowrap;justify-self:end;
+}
+.course-row-status{
+  grid-column:1;font-size:12px;font-style:normal;font-weight:500;
+  color:var(--ink-soft);
+}
+/* 고른 코스는 주황 면 + 플레이·진행 글자. 준비중은 글자·테두리로 가른다 */
+.course-row[data-kind="playable"]{
+  background:var(--accent);color:#141414;
+  box-shadow:inset 3px 0 0 #141414;
+}
+.course-row[data-kind="playable"] .course-row-status{color:#141414}
+.course-row[data-kind="soon"]{
+  cursor:default;background:var(--card);
+  box-shadow:inset 3px 0 0 var(--block);
+  outline:1px solid var(--grid);outline-offset:-1px;
+}
+.course-row:focus-visible{outline:3px solid var(--accent-deep);outline-offset:3px}
+.course-row[data-kind="playable"]:focus-visible{outline-color:var(--ink)}
+@media (hover:hover) and (pointer:fine){
+  .course-row[data-kind="playable"]:hover{filter:brightness(.97)}
+}
 
 /* 고르는 판 — 카드 뒷면. 지도가 남는 높이를 다 갖는다 */
-.pickmap{flex:1;min-height:0;display:grid;place-items:center;margin:8px 0 2px}
-.pickmap svg{width:100%;height:100%;display:block}
+.pickmap{flex:1;min-height:0;display:grid;place-items:center;margin:8px 0 2px;overflow:hidden}
+.pickmap svg{width:100%;height:100%;display:block;overflow:hidden}
 .pickmap circle{fill:var(--block);transition:fill var(--fast) var(--ease-out)}
 .pickmap .hit{fill:none;pointer-events:all}
 .gu{cursor:pointer}
@@ -174,6 +235,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   width:100%;display:flex;flex-direction:column;
   backface-visibility:hidden;
 }
+/* 미리보기 HUD 의 시간 드럼이 카드 overflow 에 잘리지 않게 */
+.card[data-preview="1"] .card-back{overflow:visible}
+.ov-hud,.ov-hud .stat.time{overflow:visible;z-index:5}
 .card-front{cursor:pointer}
 .card-back{
   position:absolute;inset:0;transform:rotateY(180deg);
@@ -208,9 +272,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
    카드의 형제다: 카드 안에 두면 카드가 제 안쪽을 잘라내 밖으로 못 나가고,
    카드와 함께 돌아 좌우까지 뒤집힌다. z-index 로 카드 밑에 깔아 물린 모양을 낸다. */
 .rail{
-  position:absolute;left:0;top:20%;z-index:0;
+  position:absolute;left:0;top:20%;z-index:4;
   display:flex;flex-direction:column;gap:6px;
-  translate:calc(-100% + 15px) 0;
+  translate:calc(-100% + 4px) 0;
   opacity:0;pointer-events:none;
   transition:opacity var(--fast) var(--ease-out);
 }
@@ -222,15 +286,15 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   width:58px;height:52px;box-sizing:border-box;padding-left:13px;
   display:grid;align-items:center;justify-items:start;cursor:pointer;
   border:0;border-radius:9px 0 0 9px;
-  background:var(--block-hi);color:#fff;
+  background:var(--card);color:var(--ink-soft);
+  box-shadow:inset -2px 0 0 var(--grid);
   transition:background var(--fast) var(--ease-out),
              color var(--fast) var(--ease-out),
              translate var(--fast) var(--ease-out);
 }
 .rail-b .i{width:22px;height:22px}
-/* 고른 탭은 카드와 같은 색이 되어 카드에 이어 붙은 한 장으로 읽힌다.
-   색만으로 가르지 않도록 왼쪽으로 더 나와 모양으로도 갈린다 */
-.rail-b[aria-selected="true"]{background:var(--card);color:var(--ink);translate:-7px 0}
+/* 고른 탭이 주황·앞으로. 예전엔 고른 탭이 카드색이라 안 고른 탭이 켜져 보였다 */
+.rail-b[aria-selected="true"]{background:var(--accent);color:#141414;translate:-7px 0;box-shadow:none}
 .rail-b:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 /* 탭을 넘길 때 칸이 모로 섰다가 돌아온다 — 카드의 다른 면을 넘긴 것으로 읽히게 */
 .card-back{perspective:900px}
@@ -295,7 +359,7 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 }
 .card[data-preview="1"] .ov-game{opacity:1;transform:none}
 .ov-game{flex:1;min-height:0;display:flex;flex-direction:column;text-align:left}
-.ov-hud{margin-bottom:4px;gap:14px;position:relative;z-index:3}
+.ov-hud{margin-bottom:4px;gap:14px;position:relative;z-index:5;overflow:visible}
 .ov-body{flex:1;min-height:0;display:flex;align-items:stretch}
 .ov-stage{flex:1;min-height:0;position:relative}
 .ov-map{width:100%;height:100%;display:block}
@@ -465,6 +529,7 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 .ov-hud .stat.time{position:relative}
 .stat.time.warn b,.stat.time.warn .ov-time{color:var(--accent-text)}
 .stat span{color:var(--ink-soft)}
+.stat.places .hud-unit{font-size:13px;font-weight:700;margin-left:4px}
 .combo{color:var(--accent-text);font-weight:800;font-size:24px;min-width:80px}
 
 .stage{flex:1;position:relative;display:flex;justify-content:center;min-height:0}
@@ -574,7 +639,9 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
 /* ── 모바일 안내 ───────────────────────── */
 #mobile{display:none;position:fixed;inset:0;place-content:center;text-align:center;padding:32px;gap:20px}
 #mobile p{color:var(--ink-soft);line-height:1.7}
-@media (pointer:coarse),(max-width:640px){
+/* 물리 키보드가 없는 기기만 가린다. 폭으로 가르면 좁힌 데스크톱에서
+   코스 목록까지 사라진다 — pointer:coarse 가 그 갈림이다 */
+@media (pointer:coarse){
   .screen{display:none!important}
   #mobile{display:grid}
 }
@@ -624,8 +691,14 @@ i.dot{display:inline-block;width:.22em;height:.22em;border-radius:50%;background
   z-index:-2;
   opacity:0; transition:opacity var(--slow) var(--ease-out);
 }
-/* 타이틀과 설정에서만 보인다. 나머지 화면에서는 조용히 빠진다 */
-body:has(#title.on) #pixelmap{opacity:1}
+/* 타이틀 히어로 맵이 고르는 판으로 미끄러지지 않게 — 장식 농도로 바로 내린다 */
+html[data-screen="regions"] #pixelmap,
+body:has(#regions.on) #pixelmap{transition:none}
+/* 타이틀에서만 또렷하다. 고르는 판에서는 장식 배경으로 내린다 */
+body:has(#title.on) #pixelmap,
+html[data-screen="title"] #pixelmap{opacity:1}
+body:has(#regions.on) #pixelmap,
+html[data-screen="regions"] #pixelmap{opacity:.14}
 /* 모바일 안내 화면에서는 .screen 을 숨겨도 픽셀맵은 화면 밖이라 따라 숨지
    않는다. 위 display:block 보다 뒤에 와야 이긴다 — 같은 특이도라 순서가 정한다 */
 @media (pointer:coarse),(max-width:640px){ #pixelmap{display:none} }
@@ -635,6 +708,12 @@ body:has(#title.on) #pixelmap{opacity:1}
   transition:transform var(--fast) var(--ease-out), fill var(--fast) var(--ease-out), opacity var(--fast) var(--ease-out);
 }
 #pixelmap circle.hilite{fill:var(--accent);opacity:1}
+html[data-screen="regions"] #pixelmap circle,
+html[data-screen="regions"] #pixelmap circle.hilite,
+body:has(#regions.on) #pixelmap circle,
+body:has(#regions.on) #pixelmap circle.hilite{
+  fill:var(--block);opacity:.28;transition:none;
+}
 .thumb svg circle{fill:#fff}
 
 /* ═══ UI 질감 ═══════════════════════════════════════════
@@ -649,6 +728,7 @@ body:has(#title.on) #pixelmap{opacity:1}
 }
 @media (hover:hover) and (pointer:fine){
   .menu button:hover, .menu a:hover, #save:hover, #again:hover{background:var(--accent)}
+  #title .menu [data-go="regions"]:hover{background:var(--accent-deep);color:#141414}
   .step:hover{color:var(--accent)}
   .toggle:hover{border-color:var(--accent)}
 }

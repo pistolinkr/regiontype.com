@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-screen="title">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -47,7 +47,7 @@
 <link rel="icon" type="image/png" sizes="any" media="(prefers-color-scheme: light)" href="favicon/dark.png?v=0.95">
 <link rel="icon" type="image/png" sizes="any" href="favicon/dark.png?v=0.95">
 <!-- 아이콘은 assets/*.svg 마스크로 그린다 (style.css 의 .i-*) -->
-<link rel="stylesheet" href="style.css?v=0.95">
+<link rel="stylesheet" href="style.css?v=1.01">
 </head>
 <body>
 
@@ -75,12 +75,20 @@
   </nav>
 </section>
 
-<!-- 지역 목록 -->
+<!-- 코스 목록 — 지도 보물찾기보다 칠 이름·개수가 먼저다 -->
 <section id="regions" class="screen">
   <div class="screen-head">
     <button class="back" data-go="title" data-i18n-aria="back" aria-label="뒤로"><i class="i i-arrow-left" aria-hidden="true"></i></button>
-    <h2 class="head" data-i18n="regions">지역</h2>
+    <h2 class="head" data-i18n="pickCourse">코스 선택</h2>
   </div>
+  <p class="course-lead" id="courseLead"></p>
+  <ul class="course-legend" data-i18n-aria="legendAria" aria-label="코스 상태">
+    <li class="is-play"><span data-i18n="statusPlay">플레이</span></li>
+    <li class="is-soon"><span data-i18n="statusSoon">준비중</span></li>
+    <li><span data-i18n="statusIdle">안 함</span></li>
+    <li><span data-i18n="statusLeftover">남음</span></li>
+    <li><span data-i18n="statusDone">완료</span></li>
+  </ul>
   <div class="course-stage">
     <ul class="course-list" id="regionList"></ul>
   </div>
@@ -140,7 +148,10 @@
     <button class="back" data-go="regions" data-i18n-aria="quit" aria-label="그만두기"><i class="i i-arrow-left" aria-hidden="true"></i></button>
     <div class="gauge"><i id="gaugeFill"></i></div>
     <div class="stat time" id="statTime"><b>0:00</b></div>
-    <div class="stat"><b id="statCount">0</b><span id="statTotal">/25</span></div>
+    <div class="stat places" data-i18n-aria="hudClaimed" aria-label="점령한 곳">
+      <b id="statCount">0</b><span id="statTotal">/25</span>
+      <span class="hud-unit" data-i18n="hudPlaces">곳</span>
+    </div>
     <div class="stat"><b id="statScore">0</b><span data-i18n="scoreUnit">점</span></div>
     <div class="stat combo" id="statCombo"></div>
   </div>
@@ -297,6 +308,6 @@
   </form>
 </dialog>
 
-<script src="app.js?v=0.95"></script>
+<script src="app.js?v=1.01"></script>
 </body>
 </html>
